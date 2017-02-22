@@ -9,7 +9,7 @@
     <Grid Margin="0,0,0,0" x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="385*"/>
-            <RowDefinition Height="15*"/>
+            <RowDefinition Height="10*"/>
             <RowDefinition Height="108*"/>
         </Grid.RowDefinitions>
         <Grid x:Name="gridImages" Margin="0" Grid.Row="0">
@@ -18,7 +18,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="337*"/>
-                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="341*"/>
             </Grid.ColumnDefinitions>
             <Image x:Name="imageBefore" Margin="10" Grid.Column="0" Grid.Row="0"/>
@@ -38,7 +38,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="211*"/>
-                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="717*"/>
             </Grid.ColumnDefinitions>
             <Grid x:Name="gridEffectTypeSelector" Margin="10" Grid.Column="0">
@@ -50,10 +50,11 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="38*"/>
+                    <RowDefinition Height="39*"/>
                 </Grid.RowDefinitions>
+                <Image HorizontalAlignment="Left" Height="37" Grid.RowSpan="2" VerticalAlignment="Top" Width="24" Margin="10,10,0,0"/>
             </Grid>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1"/>
 
