@@ -102,13 +102,46 @@ namespace Pixelator_6000
                 }
             }
         }
+        public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
+        {
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                ImageFormat finalFormat = ImageFormat.Png;
+                switch (format)
+                {
+
+                    case KnownImageFormat.png:
+                        {
+                            finalFormat = ImageFormat.Png;
+                            break;
+                        }
+                    case KnownImageFormat.bmp:
+                        {
+                            finalFormat = ImageFormat.Bmp;
+                            break;
+                        }
+                    case KnownImageFormat.gif:
+                        {
+                            finalFormat = ImageFormat.Gif;
+                            break;
+                        }
+                    case KnownImageFormat.jpeg:
+                        {
+                            finalFormat = ImageFormat.Jpeg;
+                            break;
+                        }
+                }
+                image.Save(fileStream, finalFormat);
+            }
+        }
+
         #endregion FileButtons
 
         //Tab Pixelsort
         #region Pixelsort
         //Pixelsort settings
         public bool PsBright = true;
-        public Orientation PsOrientation = Orientation.up;
+        public Orientation PsOrientation = Orientation.right;
         public float PsLimit = 0.5f;
         //TODO: Based not only on Saturation, but also Hue
         private void cbPixelsortBrightness_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -160,7 +193,7 @@ namespace Pixelator_6000
             if(imageBefore.Source != null)
             {
                 BitmapImage mySource = imageBefore.Source as BitmapImage;                
-                logic.PixelsortBySaturation(PsBright,
+                logic.PixelsortByBrightness(PsBright,
                     PsOrientation,
                     PsLimit,
                     BitmapConverter.BitmapImage2Bitmap(mySource));
@@ -174,38 +207,72 @@ namespace Pixelator_6000
 
 
 
-        
-        public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
+
+        #region Prism
+
+        int rOffsetX = 0;
+        int rOffsetY = 0;
+        int gOffsetX = 0;
+        int gOffsetY = 0;
+        int bOffsetX = 0;
+        int bOffsetY = 0;
+
+        private void prismSliderRX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            //"Red offset X:0, Y:0"
+            rOffsetX = (int)e.NewValue;
+            lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+        }
+
+        private void prismSliderRY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //minus because the slider should be the other way around: +Y means down, -Y means up
+            rOffsetY = -(int)e.NewValue;
+            lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+        }
+
+        private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            gOffsetX = (int)e.NewValue;
+            lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
+        }
+
+        private void prismSliderGY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            gOffsetY = -(int)e.NewValue;
+            lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
+        }
+
+        private void prismSliderBX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            bOffsetX = (int)e.NewValue;
+            lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
+        }
+
+        private void prismSliderBY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            bOffsetY = -(int)e.NewValue;
+            lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
+        }
+
+        private void btPrismApply_Click(object sender, RoutedEventArgs e)
+        {
+            if (imageBefore.Source != null)
             {
-                ImageFormat finalFormat = ImageFormat.Png;
-                switch (format)
-                {
-                    
-                    case KnownImageFormat.png:
-                        {
-                            finalFormat = ImageFormat.Png;
-                            break;
-                        }
-                    case KnownImageFormat.bmp:
-                        {
-                            finalFormat = ImageFormat.Bmp;
-                            break;
-                        }
-                    case KnownImageFormat.gif:
-                        {
-                            finalFormat = ImageFormat.Gif;
-                            break;
-                        }
-                    case KnownImageFormat.jpeg:
-                        {
-                            finalFormat = ImageFormat.Jpeg;
-                            break;
-                        }
-                }
-                image.Save(fileStream, finalFormat);
+                BitmapImage mySource = imageBefore.Source as BitmapImage;
+                logic.Prism(rOffsetX, 
+                    rOffsetY, 
+                    gOffsetX, 
+                    gOffsetY, 
+                    bOffsetX, 
+                    bOffsetY,
+                    BitmapConverter.BitmapImage2Bitmap(mySource));
+            }
+            else
+            {
+                MessageBox.Show("Load an image first.");
             }
         }
     }
 }
+#endregion Prism

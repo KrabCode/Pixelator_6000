@@ -77,7 +77,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BitmapConverter.cs" />
-    <Compile Include="Pixel.cs" />
     <Compile Include="RedrawEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
