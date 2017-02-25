@@ -97,27 +97,29 @@ namespace Pixelator_6000
         public void Prism(int rOffsetX, int rOffsetY, int gOffsetX, int gOffsetY, int bOffsetX, int bOffsetY, Bitmap orig)
         {
             Bitmap toDraw = new Bitmap(orig, orig.Size);
-            var chest = new BitmapChest((Bitmap)orig);
+            var origChest = new BitmapChest((Bitmap)orig);
             var drawChest = new BitmapChest(toDraw);
-            //create 3 color maps and assemble them back together with offset
-            chest.LockBits();
+            
+            //before modifying the values, it's essential to lock the bits
+            origChest.LockBits();
             drawChest.LockBits();
-            var chestRectangle = new Rectangle(0, 0, chest.Width, chest.Height);
+
+            var chestRectangle = new Rectangle(0, 0, origChest.Width, origChest.Height);
             //fill the three color maps with their respective colors
             unsafe
             {
                 //for the height of this image
-                for (int y = 0; y < chest.Height; y++)
+                for (int y = 0; y < origChest.Height; y++)
                 {
                     //iterate horizontally, line by line
-                    for (int x = 0; x < chest.Width; x++)
+                    for (int x = 0; x < origChest.Width; x++)
                     {
-                        Color origColor = chest.GetPixel(x, y);
+                        Color origColor = origChest.GetPixel(x, y);
                         Color newColor = new Color();
                         //find the line in memory
 
                         //if there is such an X and Y...
-                        if ( chestRectangle.Contains(new Point(x - rOffsetX, y - rOffsetY)) &&
+                        if (chestRectangle.Contains(new Point(x - rOffsetX, y - rOffsetY)) &&
                             chestRectangle.Contains(new Point(x - gOffsetX, y - gOffsetY)) &&
                             chestRectangle.Contains(new Point(x - bOffsetX, y - bOffsetY)))
                         /* y + rOffsetY >= 0 && y + rOffsetY < chest.Height &&
@@ -130,15 +132,15 @@ namespace Pixelator_6000
                         {
                             //...adjust for the offset...
                             newColor = Color.FromArgb(origColor.A,
-                            chest.GetPixel(x - rOffsetX, y - rOffsetY).R,
-                            chest.GetPixel(x - gOffsetX, y - gOffsetY).G,
-                            chest.GetPixel(x - bOffsetX, y - bOffsetY).B);
+                            origChest.GetPixel(x - rOffsetX, y - rOffsetY).R,
+                            origChest.GetPixel(x - gOffsetX, y - gOffsetY).G,
+                            origChest.GetPixel(x - bOffsetX, y - bOffsetY).B);
                             //...and paint it back
                             drawChest.SetPixel(x, y, newColor);
                         }
                     }
-                }                
-                chest.UnlockBits();
+                }
+                origChest.UnlockBits();
                 drawChest.UnlockBits();
                 RedrawImageAfter(this, new RedrawEventArgs(toDraw));
             }
