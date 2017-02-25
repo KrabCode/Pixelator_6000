@@ -34,21 +34,21 @@ namespace Pixelator_6000
             InitializeComponent();
         }
         Logic logic;
-        
+        bool fullyLoaded = false;
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             logic = new Logic();
             logic.RedrawImageAfter += Logic_RedrawImageAfter;
+            fullyLoaded = true;
         }
 
         private EventHandler Logic_RedrawImageAfter(object sender, RedrawEventArgs e)
         {
-            Converter pepa = new Converter();
-            imageAfter.Source =  (ImageSource)pepa.Convert(e.image, typeof(ImageSource), null, System.Globalization.CultureInfo.CurrentCulture);
+            imageAfter.Source = BitmapConverter.Bitmap2BitmapSource(e.image);
             return null;
         }
-        
 
+        #region FileButtons
         //Actions for buttons for File Operations in gridFileOperations:
         private void btOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -95,98 +95,116 @@ namespace Pixelator_6000
                             format = KnownImageFormat.gif;
                             break;
                     }
-                    SaveImageToFile(sfd.FileName, (BitmapImage)imageAfter.Source, format);
+
+                    SaveImageToFile(sfd.FileName,
+                        BitmapConverter.BitmapSource2Bitmap((BitmapSource)imageAfter.Source),
+                        format);
                 }
             }
         }
-
+        #endregion FileButtons
 
         //Tab Pixelsort
-
+        #region Pixelsort
         //Pixelsort settings
         public bool PsBright = true;
         public Orientation PsOrientation = Orientation.up;
-        public int PsLimit = 50;
+        public float PsLimit = 0.5f;
         //TODO: Based not only on Saturation, but also Hue
         private void cbPixelsortBrightness_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox lb = (ComboBox)sender;
-            if (lb.SelectedItem.ToString() == "Bright")
+            ComboBoxItem item = (ComboBoxItem)lb.SelectedItem;
+            if (item.Content.ToString() == "Bright")
             {
-
+                PsBright = true;
+            }
+            else
+            {
+                PsBright = false;
             }
         }
 
         private void cbPixelsortOrientation_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            int orientationIndex = cbPixelsortOrientation.SelectedIndex;            
+            switch(orientationIndex)
+            {
+                case 0:
+                    PsOrientation = Orientation.up;
+                    break;
+                case 1:
+                    PsOrientation = Orientation.down;
+                    break;
+                case 2:
+                    PsOrientation = Orientation.right;
+                    break;
+                case 3:
+                    PsOrientation = Orientation.left;
+                    break;
+            }            
         }
 
         private void sliderPixelsortLimit_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            float newValue = (float)e.NewValue / 100;
+            if (fullyLoaded)
+            {
+                lbPixelsortLimit.Text = "Limit: " + Math.Round(newValue,2).ToString();
+                PsLimit = newValue;
+            }
         }
 
         private void btPixelsortApply_Click(object sender, RoutedEventArgs e)
         {
-            BitmapSource mySource = (BitmapSource)imageBefore.Source;            
-            logic.PixelsortBySaturation(PsBright, PsOrientation, PsLimit, BitmapSourceToBitmap(mySource));
-        }
-
-        public static System.Drawing.Bitmap BitmapSourceToBitmap(BitmapSource srs)
-        {
-            int width = srs.PixelWidth;
-            int height = srs.PixelHeight;
-            int stride = width * ((srs.Format.BitsPerPixel + 7) / 8);
-            IntPtr ptr = IntPtr.Zero;
-            try
+            if(imageBefore.Source != null)
             {
-                ptr = Marshal.AllocHGlobal(height * stride);
-                srs.CopyPixels(new Int32Rect(0, 0, width, height), ptr, height * stride, stride);
-                using (var btm = new System.Drawing.Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format1bppIndexed, ptr))
-                {
-                    // Clone the bitmap so that we can dispose it and
-                    // release the unmanaged memory at ptr
-                    return new System.Drawing.Bitmap(btm);
-                }
+                BitmapImage mySource = imageBefore.Source as BitmapImage;                
+                logic.PixelsortBySaturation(PsBright,
+                    PsOrientation,
+                    PsLimit,
+                    BitmapConverter.BitmapImage2Bitmap(mySource));
             }
-            finally
+            else
             {
-                if (ptr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptr);
+                MessageBox.Show("Load an image first.");
             }
         }
+        #endregion Pixelsort
 
-        public static void SaveImageToFile(string filePath, BitmapImage image, KnownImageFormat format)
+
+
+        
+        public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
         {
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                BitmapEncoder encoder = null;
+                ImageFormat finalFormat = ImageFormat.Png;
                 switch (format)
                 {
+                    
                     case KnownImageFormat.png:
                         {
-                            encoder = new PngBitmapEncoder();
+                            finalFormat = ImageFormat.Png;
                             break;
                         }
                     case KnownImageFormat.bmp:
                         {
-                            encoder = new BmpBitmapEncoder();
+                            finalFormat = ImageFormat.Bmp;
                             break;
                         }
                     case KnownImageFormat.gif:
                         {
-                            encoder = new GifBitmapEncoder();
+                            finalFormat = ImageFormat.Gif;
                             break;
                         }
                     case KnownImageFormat.jpeg:
                         {
-                            encoder = new JpegBitmapEncoder();
+                            finalFormat = ImageFormat.Jpeg;
                             break;
                         }
                 }
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                encoder.Save(fileStream);
+                image.Save(fileStream, finalFormat);
             }
         }
     }
