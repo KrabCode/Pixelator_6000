@@ -44,7 +44,7 @@ namespace Pixelator_6000
 
         private EventHandler Logic_RedrawImageAfter(object sender, RedrawEventArgs e)
         {
-            imageAfter.Source = BitmapConverter.Bitmap2BitmapSource(e.image);
+            imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
             return null;
         }
 

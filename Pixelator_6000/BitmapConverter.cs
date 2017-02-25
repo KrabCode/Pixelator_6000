@@ -19,15 +19,22 @@ namespace Pixelator_6000
         public static Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
             // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
-
-            using (MemoryStream outStream = new MemoryStream())
+            try
             {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-                enc.Save(outStream);
-                Bitmap bitmap = new Bitmap(outStream);
+                using (MemoryStream outStream = new MemoryStream())
+                {
+                    BitmapEncoder enc = new BmpBitmapEncoder();
+                    enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+                    enc.Save(outStream);
+                    Bitmap bitmap = new Bitmap(outStream);
 
-                return new Bitmap(bitmap);
+                    return new Bitmap(bitmap);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("An unexpected error occured, please try again in a few seconds.");
+                return null;
             }
         }
 
