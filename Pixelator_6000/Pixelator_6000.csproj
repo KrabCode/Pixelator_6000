@@ -51,6 +51,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Pixelator_6000.App</StartupObject>
@@ -79,6 +80,7 @@
     </ApplicationDefinition>
     <Compile Include="BitmapConverter.cs" />
     <Compile Include="BitmapChest.cs" />
+    <Compile Include="CursorAnimationControl.cs" />
     <Compile Include="RedrawEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

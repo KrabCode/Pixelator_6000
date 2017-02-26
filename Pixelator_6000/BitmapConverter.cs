@@ -21,15 +21,18 @@ namespace Pixelator_6000
             // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
             try
             {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                Bitmap bitmap = null;
                 using (MemoryStream outStream = new MemoryStream())
                 {
-                    BitmapEncoder enc = new BmpBitmapEncoder();
+                    
                     enc.Frames.Add(BitmapFrame.Create(bitmapImage));
                     enc.Save(outStream);
-                    Bitmap bitmap = new Bitmap(outStream);
-
-                    return new Bitmap(bitmap);
+                    bitmap = new Bitmap(outStream);
+                    outStream.Close();
                 }
+                
+                return new Bitmap(bitmap);
             }
             catch
             {
@@ -60,14 +63,17 @@ namespace Pixelator_6000
 
         public static Bitmap BitmapSource2Bitmap(BitmapSource bmpSource)
         {
+            Bitmap result = null;
             using (MemoryStream ms = new MemoryStream())
             {
                 BitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(bmpSource));
                 encoder.Save(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-                return new Bitmap(ms);
-            }                
+                result = new Bitmap(ms);
+                ms.Close();
+            }
+            return result;
         }
     }
 }

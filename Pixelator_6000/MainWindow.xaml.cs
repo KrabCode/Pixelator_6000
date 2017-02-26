@@ -50,7 +50,9 @@ namespace Pixelator_6000
         {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
+                
             }));
+
             _imageAfterAsBmp = e.image;
             return null;
         }
@@ -80,6 +82,7 @@ namespace Pixelator_6000
             }
         }
 
+        int savedAlready = 0;
         private void btSave_Click(object sender, RoutedEventArgs e)
         {
             if(imageAfter.Source != null)
@@ -87,9 +90,9 @@ namespace Pixelator_6000
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Title = "Save image";
                 sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
-                sfd.FileName += "test";
+                sfd.FileName += "image_" + ++savedAlready;
                 KnownImageFormat format = KnownImageFormat.png;
-
+                string plus = "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+";
                 if ((bool)sfd.ShowDialog())
                 {
                     string ext = System.IO.Path.GetExtension(sfd.FileName);
@@ -107,7 +110,7 @@ namespace Pixelator_6000
                     }
 
                     SaveImageToFile(sfd.FileName,
-                        BitmapConverter.BitmapSource2Bitmap((BitmapSource)imageAfter.Source),
+                        _imageAfterAsBmp,
                         format);
                 }
             }
@@ -144,7 +147,6 @@ namespace Pixelator_6000
                 image.Save(fileStream, finalFormat);
             }
         }
-
         #endregion FileButtons
 
         
@@ -248,7 +250,7 @@ namespace Pixelator_6000
         private void prismSliderRX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //"Red offset X:0, Y:0"
-            rOffsetX = (int)e.NewValue;
+            rOffsetX = -(int)e.NewValue;
             lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
         }
 
@@ -261,7 +263,7 @@ namespace Pixelator_6000
 
         private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            gOffsetX = (int)e.NewValue;
+            gOffsetX = -(int)e.NewValue;
             lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
         }
 
@@ -273,7 +275,7 @@ namespace Pixelator_6000
 
         private void prismSliderBX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            bOffsetX = (int)e.NewValue;
+            bOffsetX = -(int)e.NewValue;
             lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
         }
 
@@ -285,18 +287,15 @@ namespace Pixelator_6000
 
         private void btPrismApply_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (_imageBeforeAsBmp != null)
             {
-                Task t = Task.Run(delegate {
-                    _logic.Prism(rOffsetX, 
-                    rOffsetY, 
-                    gOffsetX, 
-                    gOffsetY, 
-                    bOffsetX, 
-                    bOffsetY,
-                    new Bitmap(_imageBeforeAsBmp));
-                });
+                    Task t = Task.Run(delegate {                        
+                        _logic.Prism(rOffsetX, rOffsetY,
+                                    gOffsetX, gOffsetY,
+                                    bOffsetX, bOffsetY,
+                                    new Bitmap(_imageBeforeAsBmp));                        
+                    });
             }
             else
             {
