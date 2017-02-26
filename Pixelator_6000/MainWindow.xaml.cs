@@ -33,18 +33,25 @@ namespace Pixelator_6000
         {
             InitializeComponent();
         }
-        Logic logic;
-        bool fullyLoaded = false;
+        private Logic _logic;
+        private Bitmap _imageAfterAsBmp;
+        private Bitmap _imageBeforeAsBmp;
+
+        private bool fullyLoaded = false;
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            logic = new Logic();
-            logic.RedrawImageAfter += Logic_RedrawImageAfter;
+            _logic = new Logic();
+            _logic.RedrawImageAfter += Logic_RedrawImageAfter;
+
             fullyLoaded = true;
         }
 
         private EventHandler Logic_RedrawImageAfter(object sender, RedrawEventArgs e)
         {
-            imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
+            }));
+            _imageAfterAsBmp = e.image;
             return null;
         }
 
@@ -60,6 +67,7 @@ namespace Pixelator_6000
                 //Dialog success: load the file at ofd.FileName and load it to ImgBefore
                 BitmapSource imgSource = new BitmapImage(new Uri(ofd.FileName));
                 imageBefore.Source = imgSource;
+                _imageBeforeAsBmp = BitmapConverter.BitmapSource2Bitmap(imgSource);
             }
         }
 
@@ -67,7 +75,8 @@ namespace Pixelator_6000
         {
             if (imageAfter.Source != null)
             {
-                imageBefore.Source = imageAfter.Source;
+                imageBefore.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)_imageAfterAsBmp.Clone());
+                _imageBeforeAsBmp = _imageAfterAsBmp;
             }
         }
 
@@ -78,6 +87,7 @@ namespace Pixelator_6000
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Title = "Save image";
                 sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
+                sfd.FileName += "test";
                 KnownImageFormat format = KnownImageFormat.png;
 
                 if ((bool)sfd.ShowDialog())
@@ -137,12 +147,13 @@ namespace Pixelator_6000
 
         #endregion FileButtons
 
-        //Tab Pixelsort
-        #region Pixelsort
+        
+        #region PixelsortControls
         //Pixelsort settings
-        public bool PsBright = true;
-        public Orientation PsOrientation = Orientation.right;
-        public float PsLimit = 0.5f;
+        private bool PsBright = true;
+        private Orientation PsOrientation = Orientation.right;
+        private float PsLimit = 0.5f;
+        private bool applyNewSettingsAutomatically = false;
         //TODO: Based not only on Saturation, but also Hue
         private void cbPixelsortBrightness_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -185,30 +196,47 @@ namespace Pixelator_6000
             {
                 lbPixelsortLimit.Text = "Limit: " + Math.Round(newValue,2).ToString();
                 PsLimit = newValue;
+                if(applyNewSettingsAutomatically)
+                {
+                    TryPixelsort();
+                }
             }
+        }
+
+        private void checkBox_Checked(object sender, RoutedEventArgs e)
+        {
+            btPixelsortApply.IsEnabled = !btPixelsortApply.IsEnabled;
+            applyNewSettingsAutomatically = !applyNewSettingsAutomatically;
         }
 
         private void btPixelsortApply_Click(object sender, RoutedEventArgs e)
         {
-            if(imageBefore.Source != null)
+            TryPixelsort();
+        }
+        
+        private void TryPixelsort()
+        {
+            if (_imageBeforeAsBmp != null)
             {
-                BitmapImage mySource = imageBefore.Source as BitmapImage;                
-                logic.PixelsortByBrightness(PsBright,
+                Task t = Task.Run(delegate {
+                    _logic.PixelsortByBrightness(PsBright,
                     PsOrientation,
                     PsLimit,
-                    BitmapConverter.BitmapImage2Bitmap(mySource));
+                    new Bitmap(_imageBeforeAsBmp));
+                });
             }
             else
             {
                 MessageBox.Show("Load an image first.");
             }
         }
-        #endregion Pixelsort
+        
+        #endregion PixelsortControls
 
 
 
 
-        #region Prism
+        #region PrismControls
 
         int rOffsetX = 0;
         int rOffsetY = 0;
@@ -226,7 +254,7 @@ namespace Pixelator_6000
 
         private void prismSliderRY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //minus because the slider should be the other way around: +Y means down, -Y means up
+            //minus because the Y slider should be the other way around: +Y means down, -Y means up
             rOffsetY = -(int)e.NewValue;
             lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
         }
@@ -257,22 +285,26 @@ namespace Pixelator_6000
 
         private void btPrismApply_Click(object sender, RoutedEventArgs e)
         {
-            if (imageBefore.Source != null)
+            
+            if (_imageBeforeAsBmp != null)
             {
-                BitmapImage mySource = imageBefore.Source as BitmapImage;
-                logic.Prism(rOffsetX, 
+                Task t = Task.Run(delegate {
+                    _logic.Prism(rOffsetX, 
                     rOffsetY, 
                     gOffsetX, 
                     gOffsetY, 
                     bOffsetX, 
                     bOffsetY,
-                    BitmapConverter.BitmapImage2Bitmap(mySource));
+                    new Bitmap(_imageBeforeAsBmp));
+                });
             }
             else
             {
                 MessageBox.Show("Load an image first.");
             }
         }
+        #endregion PrismControls
+
+        
     }
 }
-#endregion Prism

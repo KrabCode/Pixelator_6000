@@ -5,21 +5,23 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 
 namespace Pixelator_6000
 {
     public enum Orientation { up, right, down, left };
+    public enum Effect { pixelsort, prism};
     class Logic
     {
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
         public event RedrawEvent RedrawImageAfter;
-
+        
         public void PixelsortByBrightness(bool bright, Orientation pixelsortDirection, float limit, Bitmap orig)
         {
             //base image orientation = up
-            //base pixel sort orientation = right
+            //base pixel sort orientation = right (the cycle is: for each line, iterate the columns)
             //the orientation of the image is always -90° to the orientation of the desired pixelsort
             //let's reflect that:
             Orientation imageDirection = Orientation.up;
@@ -56,9 +58,11 @@ namespace Pixelator_6000
 
             Color current = new Color();
             Color recent = new Color();
+
+            //for each line
             for (int y = 0; y < chest.Height; y++)
             {
-                //iterate horizontally, line by line
+                //iterate through the columns horizontally
                 for (int x = 0; x < chest.Width; x++)
                 {
 
@@ -90,60 +94,66 @@ namespace Pixelator_6000
             chest.UnlockBits();
             //rotate the whole image back before you return it
             orig = Rotate(orig, imageDirection, reverse: true);
+            
             RedrawImageAfter(this, new RedrawEventArgs(orig));
-
         }
 
+        /// <summary>
+        /// Applies the Prism effect and updates imageAfter with the result
+        /// </summary>
+        /// <param name="rOffsetX"></param>
+        /// <param name="rOffsetY"></param>
+        /// <param name="gOffsetX"></param>
+        /// <param name="gOffsetY"></param>
+        /// <param name="bOffsetX"></param>
+        /// <param name="bOffsetY"></param>
+        /// <param name="orig">Shouldn't be null</param>
         public void Prism(int rOffsetX, int rOffsetY, int gOffsetX, int gOffsetY, int bOffsetX, int bOffsetY, Bitmap orig)
         {
-            Bitmap toDraw = new Bitmap(orig, orig.Size);
-            var origChest = new BitmapChest((Bitmap)orig);
-            var drawChest = new BitmapChest(toDraw);
-            
-            //before modifying the values, it's essential to lock the bits
-            origChest.LockBits();
-            drawChest.LockBits();
-
-            var chestRectangle = new Rectangle(0, 0, origChest.Width, origChest.Height);
-            //fill the three color maps with their respective colors
-            unsafe
+            if(orig != null)
             {
-                //for the height of this image
-                for (int y = 0; y < origChest.Height; y++)
+                Bitmap toDraw = new Bitmap(orig, orig.Size);
+                var origChest = new BitmapChest((Bitmap)orig);
+                var drawChest = new BitmapChest(toDraw);
+
+                //before modifying the values, it's essential to lock the bits
+                origChest.LockBits();
+                drawChest.LockBits();
+
+                var chestRectangle = new Rectangle(0, 0, origChest.Width, origChest.Height);
+                //fill the three color maps with their respective colors
+                unsafe
                 {
-                    //iterate horizontally, line by line
-                    for (int x = 0; x < origChest.Width; x++)
+                    //for the height of this image
+                    for (int y = 0; y < origChest.Height; y++)
                     {
-                        Color origColor = origChest.GetPixel(x, y);
-                        Color newColor = new Color();
-                        //find the line in memory
-
-                        //if there is such an X and Y...
-                        if (chestRectangle.Contains(new Point(x - rOffsetX, y - rOffsetY)) &&
-                            chestRectangle.Contains(new Point(x - gOffsetX, y - gOffsetY)) &&
-                            chestRectangle.Contains(new Point(x - bOffsetX, y - bOffsetY)))
-                        /* y + rOffsetY >= 0 && y + rOffsetY < chest.Height &&
-                         y + gOffsetY >= 0 && y + gOffsetY < chest.Height &&
-                         y + bOffsetY >= 0 && y + bOffsetY < chest.Height &&
-
-                         x + rOffsetX >= 0 &&    x + rOffsetX < chest.Width &&
-                         x + gOffsetX >= 0 &&    x + gOffsetX < chest.Width &&
-                         x + bOffsetX >= 0 &&    x + bOffsetX < chest.Width*/
+                        //iterate horizontally, line by line
+                        for (int x = 0; x < origChest.Width; x++)
                         {
-                            //...adjust for the offset...
-                            newColor = Color.FromArgb(origColor.A,
-                            origChest.GetPixel(x - rOffsetX, y - rOffsetY).R,
-                            origChest.GetPixel(x - gOffsetX, y - gOffsetY).G,
-                            origChest.GetPixel(x - bOffsetX, y - bOffsetY).B);
-                            //...and paint it back
-                            drawChest.SetPixel(x, y, newColor);
+                            Color origColor = origChest.GetPixel(x, y);
+                            Color newColor = new Color();
+
+                            //if there is such an X and Y...
+                            if (chestRectangle.Contains(new System.Drawing.Point(x + rOffsetX, y + rOffsetY)) &&
+                                chestRectangle.Contains(new System.Drawing.Point(x + gOffsetX, y + gOffsetY)) &&
+                                chestRectangle.Contains(new System.Drawing.Point(x + bOffsetX, y + bOffsetY)))
+                            {
+                                //...adjust for the offset...
+                                newColor = Color.FromArgb(origColor.A,                                
+                                    origChest.GetPixel(x + rOffsetX, y + rOffsetY).R,
+                                    origChest.GetPixel(x + gOffsetX, y + gOffsetY).G,
+                                    origChest.GetPixel(x + bOffsetX, y + bOffsetY).B);
+
+                                //...and paint it back
+                                drawChest.SetPixel(x, y, newColor);
+                            }
                         }
                     }
+                    origChest.UnlockBits();
+                    drawChest.UnlockBits();
+                    RedrawImageAfter(this, new RedrawEventArgs(toDraw));
                 }
-                origChest.UnlockBits();
-                drawChest.UnlockBits();
-                RedrawImageAfter(this, new RedrawEventArgs(toDraw));
-            }
+            }                       
         }
 
         private Bitmap Rotate(Bitmap bmp, Orientation orientation, bool reverse)
@@ -191,89 +201,4 @@ namespace Pixelator_6000
 }
     
 
-        /*
-        private unsafe void SetPixel(byte* row, int x, Color setThis)
-        {
-            int pixelSize = 4;
-            row[x * pixelSize] = setThis.B;         //Blue  0-255
-            row[x * pixelSize + 1] = setThis.G;     //Green 0-255
-            row[x * pixelSize + 2] = setThis.R;     //Red   0-255
-            row[x * pixelSize + 3] = setThis.A;     //Alpha 0-255
-        }
-
-        /// <summary>
-        /// This fully trusts the caller. Do not ask for addresses that are not there!
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        private unsafe Color GetPixel(byte* row, int x, int width, int depth)
-        {
-            int blue = 0;
-            int green = 0;
-            int red = 0;
-            int alpha = 0;
-            
-            blue = row[x * depth];          //Blue  0-255
-            green = row[x * depth + 1];     //Green  0-255
-            red = row[x * depth + 2];       //Red   0-255
-            alpha = row[x * depth + 3];     //Alpha 0-255
-
-            
-            if(x * pixelSize + 3 < width)
-            { 
-                blue = row[x * pixelSize];          //Blue  0-255
-                green = row[x * pixelSize + 1];     //Green  0-255
-                red = row[x * pixelSize + 2];       //Red   0-255
-                alpha = row[x * pixelSize + 3];     //Alpha 0-255
-            }            
-            else
-            {
-                blue = row[(x * pixelSize) % (width)];
-                green = row[(x * pixelSize + 1) % (width)];
-                red = row[(x * pixelSize + 2) % (width)];
-                alpha = row[(x * pixelSize + 3) % width];
-            }
-
-            Color result = Color.FromArgb(blue, green, red);
-
-            return result;
-        }/*
-    }
-
-    
-}
-
-/*----------------------------------------------
- *                   TEMPLATE                           
- *----------------------------------------------
-            
-    // get Bitmap bmp as parameter
-    BitmapData bmd = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
-                                        System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                                        bmp.PixelFormat);
-
-    int PixelSize = 4;
-
-    unsafe
-    {
-        for (int y = 0; y < bmd.Height; y++)
-        {
-            byte* row = (byte*)bmd.Scan0 + (y * bmd.Stride);
-
-            //iterate horizontally, line by line
-            for (int x = 0; x < bmd.Width; x++)
-            {
-                        
-                row[x * PixelSize] = 0;   //Blue  0-255
-                row[x * PixelSize + 1] = 255; //Green 0-255
-                row[x * PixelSize + 2] = 0;   //Red   0-255
-                row[x * PixelSize + 3] = 50;  //Alpha 0-255
-                        
-            }
-        }
-    }
-
-    bmp.UnlockBits(bmd);
-
-     */
+        

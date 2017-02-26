@@ -33,7 +33,7 @@ namespace Pixelator_6000
             }
             catch
             {
-                MessageBox.Show("An unexpected error occured, please try again in a few seconds.");
+                MessageBox.Show("BitmapConverter.BitmapImage2Bitmap(BitmapImage bitmapImage) failed.");
                 return null;
             }
         }
@@ -68,6 +68,6 @@ namespace Pixelator_6000
                 ms.Seek(0, SeekOrigin.Begin);
                 return new Bitmap(ms);
             }                
-        }        
+        }
     }
 }

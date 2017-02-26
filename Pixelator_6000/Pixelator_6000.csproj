@@ -132,13 +132,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="folder-open-image.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="blue-folder-open-image.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="disk.png" />
@@ -147,19 +141,7 @@
     <Resource Include="blue-folder-horizontal-open.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="auction-hammer.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="arrow-turn-090.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="color--arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="color.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="image-sharpen.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

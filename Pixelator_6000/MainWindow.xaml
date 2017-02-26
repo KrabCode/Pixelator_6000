@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Pixelator_6000"
         mc:Ignorable="d"
-        Title="Pixelator 6000" Height="547.76" Width="780.937" Loaded="mainWindow_Loaded" WindowStyle="ThreeDBorderWindow">
+        Title="Pixelator 6000" Height="548.427" Width="728.937" Loaded="mainWindow_Loaded" WindowStyle="ThreeDBorderWindow">
     <Grid Margin="0,0,0,0" x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="385*"/>
@@ -66,8 +66,8 @@
                 <TabItem Header="Pixel Sort">
                     <Grid Background="White" ShowGridLines="True" Margin="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="352*"/>
-                            <ColumnDefinition Width="249*"/>
+                            <ColumnDefinition Width="351*"/>
+                            <ColumnDefinition Width="350*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
@@ -85,13 +85,14 @@
                         </ComboBox>
                         <TextBlock Margin="10,16,0,0" TextWrapping="Wrap" Text="Brightness:" HorizontalAlignment="Left" Width="63" Grid.Row="1" RenderTransformOrigin="1.159,0.526" Height="19" VerticalAlignment="Top"/>
                         <TextBlock Margin="10,13,0,0" TextWrapping="Wrap" Text="Orientation:" HorizontalAlignment="Left" Width="63" Height="20" VerticalAlignment="Top"/>
-                        <Slider x:Name="sliderPixelsortLimit" Value="50" Maximum="100" AutoToolTipPlacement="TopLeft" Grid.Column="1" ValueChanged="sliderPixelsortLimit_ValueChanged" VerticalAlignment="Stretch" SmallChange="1" LargeChange="20"/>
+                        <Slider x:Name="sliderPixelsortLimit" Value="50" Maximum="100" AutoToolTipPlacement="TopLeft" Grid.Column="1" ValueChanged="sliderPixelsortLimit_ValueChanged" VerticalAlignment="Center" SmallChange="1" LargeChange="20"/>
                         <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 50" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
-                        <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" />
+                        <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" Margin="67,0,0,0" />
+                        <CheckBox x:Name="checkBox" Content="Auto" Grid.Column="1" HorizontalAlignment="Left" Margin="5,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50" Checked="checkBox_Checked"/>
 
                     </Grid>
                 </TabItem>
-                <TabItem Header="Prism" > 
+                <TabItem Header="Prism" >
                     <Grid Background="White">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
