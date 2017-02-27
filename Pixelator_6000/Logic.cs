@@ -11,8 +11,9 @@ using System.Windows.Media.Imaging;
 
 namespace Pixelator_6000
 {
+    
     public enum Orientation { up, right, down, left };
-    public enum Effect { pixelsort, prism};
+    
     class Logic
     {
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
@@ -20,42 +21,56 @@ namespace Pixelator_6000
         
         public void PixelsortByBrightness(bool bright, Orientation pixelsortDirection, float limit, Bitmap orig)
         {
+            //in order to implement pixelsort in four directions I just rotate the image prior to the main cycle
+
             //base image orientation = up
+            //^^^^
+            //||||
+            //||||
+
             //base pixel sort orientation = right (the cycle is: for each line, iterate the columns)
-            //the orientation of the image is always -90° to the orientation of the desired pixelsort
+            //---->
+            //---->
+            //---->
+
+            //the orientation of the image is always +90°(counter-clockwise) to the orientation of the desired pixelsort
             //let's reflect that:
-            Orientation imageDirection = Orientation.up;
+            Orientation desiredImageDirection = Orientation.up;
             switch (pixelsortDirection)
             {
                 case Orientation.up:
                     {
-                        imageDirection = Orientation.left;
+                        desiredImageDirection = Orientation.left;
                         break;
                     }
                 case Orientation.right:
                     {
-                        imageDirection = Orientation.up;
+                        desiredImageDirection = Orientation.up;
                         break;
                     }
                 case Orientation.down:
                     {
-                        imageDirection = Orientation.right;
+                        desiredImageDirection = Orientation.right;
                         break;
                     }
                 case Orientation.left:
                     {
-                        imageDirection = Orientation.down;
+                        desiredImageDirection = Orientation.down;
                         break;
-                    }
+                    }               
             }
+
             //and rotate the whole image so that the sorting algorithm can remain the same, it's complicated enough as it is
-            orig = Rotate(orig, imageDirection, reverse: false);
+            orig = Rotate(orig, desiredImageDirection, reverse: false);
 
-
+            //this chest boosts performance by orders of magnitude as opposed to Bitmap.getPixel(x, y) and Bitmap.setPixel(x, y, Color)
+            //only thing to keep in mind is to lock it prior to modification and unlock it afterwards.
             BitmapChest chest = new BitmapChest(orig);
             chest.LockBits();
-            bool sorting = false;
 
+
+            //Main pixelsorting cycle:
+            bool sorting = false;
             Color current = new Color();
             Color recent = new Color();
 
@@ -64,9 +79,12 @@ namespace Pixelator_6000
             {
                 //iterate through the columns horizontally
                 for (int x = 0; x < chest.Width; x++)
-                {
+                {   
+                    //---->
+                    //---->
+                    //---->
 
-                    //initialize values
+                    //what's this pixel's color?
                     current = chest.GetPixel(x, y);
 
                     //sort this pixel?
@@ -91,37 +109,30 @@ namespace Pixelator_6000
                 }
 
             }
+            //unlock the chest before using the image
             chest.UnlockBits();
+
             //rotate the whole image back before you return it
-            orig = Rotate(orig, imageDirection, reverse: true);
+            orig = Rotate(orig, desiredImageDirection, reverse: true);
             
+            //fire the event that redraws the modified image display on a UI thread in MainWindow.xaml.cs
             RedrawImageAfter(this, new RedrawEventArgs(orig));
         }
 
-        /// <summary>
-        /// Applies the Prism effect and updates imageAfter with the result
-        /// </summary>
-        /// <param name="rOffsetX"></param>
-        /// <param name="rOffsetY"></param>
-        /// <param name="gOffsetX"></param>
-        /// <param name="gOffsetY"></param>
-        /// <param name="bOffsetX"></param>
-        /// <param name="bOffsetY"></param>
-        /// <param name="orig">Shouldn't be null</param>
         public void Prism(int rOffsetX, int rOffsetY, int gOffsetX, int gOffsetY, int bOffsetX, int bOffsetY, Bitmap orig)
         {
             if(orig != null)
             {
                 Bitmap toDraw = new Bitmap(orig, orig.Size);
-                var origChest = new BitmapChest((Bitmap)orig);
-                var drawChest = new BitmapChest(toDraw);
+                BitmapChest origChest = new BitmapChest((Bitmap)orig);
+                BitmapChest drawChest = new BitmapChest(toDraw);
 
-                //before modifying the values, it's essential to lock the bits
+                //lock the bits before modifying the values
                 origChest.LockBits();
                 drawChest.LockBits();
 
-                var chestRectangle = new Rectangle(0, 0, origChest.Width, origChest.Height);
-                //fill the three color maps with their respective colors
+                Rectangle origSize = new Rectangle(0, 0, origChest.Width, origChest.Height);
+                
                 unsafe
                 {
                     //for the height of this image
@@ -134,9 +145,9 @@ namespace Pixelator_6000
                             Color newColor = new Color();
 
                             //if there is such an X and Y...
-                            if (chestRectangle.Contains(new System.Drawing.Point(x + rOffsetX, y + rOffsetY)) &&
-                                chestRectangle.Contains(new System.Drawing.Point(x + gOffsetX, y + gOffsetY)) &&
-                                chestRectangle.Contains(new System.Drawing.Point(x + bOffsetX, y + bOffsetY)))
+                            if (origSize.Contains(new System.Drawing.Point(x + rOffsetX, y + rOffsetY)) &&
+                                origSize.Contains(new System.Drawing.Point(x + gOffsetX, y + gOffsetY)) &&
+                                origSize.Contains(new System.Drawing.Point(x + bOffsetX, y + bOffsetY)))
                             {
                                 //...adjust for the offset...
                                 newColor = Color.FromArgb(origColor.A,                                
@@ -155,7 +166,7 @@ namespace Pixelator_6000
                 }
             }                       
         }
-
+        
         private Bitmap Rotate(Bitmap bmp, Orientation orientation, bool reverse)
         {
             //angles are considered counter-clockwise

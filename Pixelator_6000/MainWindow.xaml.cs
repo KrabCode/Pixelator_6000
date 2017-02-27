@@ -205,10 +205,10 @@ namespace Pixelator_6000
             }
         }
 
-        private void checkBox_Checked(object sender, RoutedEventArgs e)
+        private void checkBoxPixelsortAuto_Click(object sender, RoutedEventArgs e)
         {
-            btPixelsortApply.IsEnabled = !btPixelsortApply.IsEnabled;
-            applyNewSettingsAutomatically = !applyNewSettingsAutomatically;
+            applyNewSettingsAutomatically = (bool)checkBoxPixelsortAuto.IsChecked;
+            btPixelsortApply.IsEnabled = !(bool)checkBoxPixelsortAuto.IsChecked;
         }
 
         private void btPixelsortApply_Click(object sender, RoutedEventArgs e)
@@ -234,9 +234,7 @@ namespace Pixelator_6000
         }
         
         #endregion PixelsortControls
-
-
-
+        
 
         #region PrismControls
 
@@ -302,6 +300,8 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
+
+
         #endregion PrismControls
 
         

@@ -88,7 +88,7 @@
                         <Slider x:Name="sliderPixelsortLimit" Value="50" Maximum="100" AutoToolTipPlacement="TopLeft" Grid.Column="1" ValueChanged="sliderPixelsortLimit_ValueChanged" VerticalAlignment="Center" SmallChange="1" LargeChange="20"/>
                         <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 50" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
                         <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" Margin="67,0,0,0" />
-                        <CheckBox x:Name="checkBox" Content="Auto" Grid.Column="1" HorizontalAlignment="Left" Margin="5,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50" Checked="checkBox_Checked"/>
+                        <CheckBox x:Name="checkBoxPixelsortAuto" Content="Auto" Grid.Column="1" HorizontalAlignment="Left" Margin="5,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50" Click="checkBoxPixelsortAuto_Click"/>
 
                     </Grid>
                 </TabItem>
