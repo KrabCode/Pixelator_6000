@@ -21,9 +21,8 @@
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="300*"/>
             </Grid.ColumnDefinitions>
-            <Canvas Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
-                <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </Canvas>
+                <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+            
 
             <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Grid.Row="0" Stretch="Uniform"/>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
@@ -137,9 +136,9 @@
                             <ComboBoxItem Content="Gauss"/>
                             <ComboBoxItem Content="Pixelate"/>
                         </ComboBox>
-                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged"/>
-                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: " Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
-                        <Button x:Name="btBlurApply" Content="Apply" Grid.Column="2"  HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom"/>
+                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100" Minimum="3"/>
+                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 3" Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
+                        <Button x:Name="btBlurApply" Content="Apply" Grid.Column="2"  HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom" Click="btBlurApply_Click"/>
 
 
                     </Grid>

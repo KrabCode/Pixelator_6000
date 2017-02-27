@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SuperfastBlur;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -16,6 +17,10 @@ namespace Pixelator_6000
     
     class Logic
     {
+        //If you're crafting a new effect, observe the rules outlined in MainWindow.xaml.cs!
+        //Namely: return the resulting bitmap using the event RedrawImageAfter...
+        //...and pass your new modified bitmap to it as a constructor parameter of a new RedrawEventArgs
+        //like so: RedrawImageAfter(this, new RedrawEventArgs(modifiedBitmap));
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
         public event RedrawEvent RedrawImageAfter;
         
@@ -165,6 +170,13 @@ namespace Pixelator_6000
                     RedrawImageAfter(this, new RedrawEventArgs(toDraw));
                 }
             }                       
+        }
+
+        public void Blur(Bitmap original, int intensity)
+        {
+            GaussianBlur blur = new GaussianBlur(new Bitmap(original));
+            
+            RedrawImageAfter(this, new RedrawEventArgs(blur.Process(intensity)));
         }
         
         private Bitmap Rotate(Bitmap bmp, Orientation orientation, bool reverse)
