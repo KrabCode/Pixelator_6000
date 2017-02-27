@@ -66,7 +66,7 @@ namespace Pixelator_6000
             _imageAfterAsBmp = e.image;            
             return null;
         }
-
+        
         void SetBusy(bool toThis)
         {
             if(toThis && !_busy)
