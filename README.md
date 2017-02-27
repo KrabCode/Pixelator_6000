@@ -7,3 +7,5 @@ Install instructions:
 - Windows will freak out
   - Select "More info" and let the app through.
 - Profit
+
+Or just open the project in Visual studio 2015+ and build it.
