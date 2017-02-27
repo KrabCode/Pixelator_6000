@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Pixelator_6000"
         mc:Ignorable="d"
-        Title="Pixelator 6000" Height="548.427" Width="839.937" Loaded="mainWindow_Loaded" WindowStyle="ThreeDBorderWindow">
+        Title="Pixelator 6000" Height="633.827" Width="777.936" Loaded="mainWindow_Loaded" WindowStyle="ThreeDBorderWindow">
     <Grid Margin="0,0,0,0" x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="385*"/>
@@ -21,7 +21,10 @@
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="300*"/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="imageBefore" Margin="10" Grid.Column="0" Grid.Row="0" Stretch="Uniform"/>
+            <Canvas Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+                <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Canvas>
+
             <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Grid.Row="0" Stretch="Uniform"/>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
 
@@ -66,7 +69,7 @@
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
             <TabControl x:Name="gridEffectParameters" Grid.Column="2" Margin="5,5,5,5">
                 <TabItem Header="Pixel Sort">
-                    <Grid Background="White" ShowGridLines="True" Margin="0">
+                    <Grid Background="White" Margin="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="351*"/>
                             <ColumnDefinition Width="350*"/>
@@ -89,7 +92,7 @@
                         <TextBlock Margin="10,13,0,0" TextWrapping="Wrap" Text="Orientation:" HorizontalAlignment="Left" Width="63" Height="20" VerticalAlignment="Top"/>
                         <Slider x:Name="sliderPixelsortLimit" Value="50" Maximum="100" AutoToolTipPlacement="TopLeft" Grid.Column="1" ValueChanged="sliderPixelsortLimit_ValueChanged" VerticalAlignment="Center" SmallChange="1" LargeChange="20"/>
                         <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 50" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
-                        <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click"  />
+                        <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" Width="75" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
 
                     </Grid>
                 </TabItem>
@@ -105,18 +108,40 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <Slider x:Name="prismSliderRX" Minimum="-10" Margin="0,0,24,45" ValueChanged="prismSliderRX_ValueChanged" />
-                        <Slider x:Name="prismSliderRY"  Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderRY_ValueChanged"/>
-                        <Label x:Name="lbPrismInfotextR" Content="Red offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,44,0,0" />
+                        <Slider x:Name="prismSliderRX" Minimum="-10" Margin="19,0,5,0" ValueChanged="prismSliderRX_ValueChanged" Height="24" VerticalAlignment="Top" />
+                        <Slider x:Name="prismSliderRY"  Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Minimum="-10" ValueChanged="prismSliderRY_ValueChanged" Margin="1,0,0,0"/>
+                        <Label x:Name="lbPrismInfotextR" Content="Red offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="29,23,0,0" />
 
-                        <Slider x:Name="prismSliderGX"  Grid.Column="1" Minimum="-10" Margin="0,0,24,45" ValueChanged="prismSliderGX_ValueChanged"/>
-                        <Slider x:Name="prismSliderGY"  Grid.Column="1" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderGY_ValueChanged"/>
-                        <Label x:Name="lbPrismInfotextG" Grid.Column="1" Content="Green offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,44,0,0" />
+                        <Slider x:Name="prismSliderGX"  Grid.Column="1" Minimum="-10" Margin="0,0,24,0" ValueChanged="prismSliderGX_ValueChanged" Height="28" VerticalAlignment="Top"/>
+                        <Slider x:Name="prismSliderGY"  Grid.Column="1" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderGY_ValueChanged" Width="23"/>
+                        <Label x:Name="lbPrismInfotextG" Grid.Column="1" Content="Green offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,23,0,0" />
 
-                        <Slider x:Name="prismSliderBX" Grid.Column="2" Minimum="-10" Margin="0,0,24,45" ValueChanged="prismSliderBX_ValueChanged"/>
-                        <Slider x:Name="prismSliderBY"  Grid.Column="2" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderBY_ValueChanged"/>
-                        <Label x:Name="lbPrismInfotextB" Grid.Column="2" Content="Blue offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,44,0,0" />
-                        <Button x:Name="btPrismApply" Content="Apply" Grid.Column="3" Click="btPrismApply_Click" Margin="10,0,0,0" />
+                        <Slider x:Name="prismSliderBX" Grid.Column="2" Minimum="-10" Margin="0,0,24,0" ValueChanged="prismSliderBX_ValueChanged" Height="24" VerticalAlignment="Top"/>
+                        <Slider x:Name="prismSliderBY"  Grid.Column="2" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderBY_ValueChanged" Width="23"/>
+                        <Label x:Name="lbPrismInfotextB" Grid.Column="2" Content="Blue offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,43,0,0" />
+                        <Button x:Name="btPrismApply" Content="Apply" Grid.Column="3" Click="btPrismApply_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Height="20" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Blur" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="54">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="216*"/>
+                            <ColumnDefinition Width="250*"/>
+                            <ColumnDefinition Width="191*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Width="156" Margin="17,15,0,0" SelectedIndex="0" Height="25" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
+                            <ComboBoxItem Content="Median"/>
+                            <ComboBoxItem Content="Gauss"/>
+                            <ComboBoxItem Content="Pixelate"/>
+                        </ComboBox>
+                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged"/>
+                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: " Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
+                        <Button x:Name="btBlurApply" Content="Apply" Grid.Column="2"  HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom"/>
+
+
                     </Grid>
                 </TabItem>
             </TabControl>

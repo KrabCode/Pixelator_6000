@@ -105,20 +105,18 @@ namespace Pixelator_6000
             }
         }
 
-        //Checkboxes in the same grid
+        
+        //Checkboxes in the same grid:
         private void checkInstant_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = (bool)checkInstant.IsChecked;
 
-            _applyNewSettingsAutomatically = isChecked;
-
-            btPixelsortApply.IsEnabled = !isChecked;
-            btPrismApply.IsEnabled = !isChecked;
+            _applyNewSettingsAutomatically = isChecked;            
         }
 
         private void checkCrop_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO
         }
 
         
@@ -384,8 +382,17 @@ namespace Pixelator_6000
 
 
 
+
         #endregion PrismControls
 
-        
+        private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void sliderBlurMagnitude_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
     }
 }
