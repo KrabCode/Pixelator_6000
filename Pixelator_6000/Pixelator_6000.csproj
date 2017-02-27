@@ -80,7 +80,6 @@
     </ApplicationDefinition>
     <Compile Include="BitmapConverter.cs" />
     <Compile Include="BitmapChest.cs" />
-    <Compile Include="CursorAnimationControl.cs" />
     <Compile Include="RedrawEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

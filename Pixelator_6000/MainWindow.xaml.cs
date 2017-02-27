@@ -33,32 +33,55 @@ namespace Pixelator_6000
         {
             InitializeComponent();
         }
+        //Global variables
         private Logic _logic;
         private Bitmap _imageAfterAsBmp;
         private Bitmap _imageBeforeAsBmp;
+        private bool _applyNewSettingsAutomatically = false;
+        private bool _busy = false;    //Do not set this manually - use the SetBusy(bool) method!
+        private bool appFullyLoaded = false;
+        private int imagesSaved = 0;
 
-        private bool fullyLoaded = false;
+        //Pixelsort settings
+        private bool psBright = true;
+        private Orientation psOrientation = Orientation.right;
+        private float psLimit = 0.5f;
+        
+                
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _logic = new Logic();
             _logic.RedrawImageAfter += Logic_RedrawImageAfter;
 
-            fullyLoaded = true;
+            appFullyLoaded = true;
         }
 
         private EventHandler Logic_RedrawImageAfter(object sender, RedrawEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
-                
-            }));
 
-            _imageAfterAsBmp = e.image;
+                SetBusy(false);
+            }));
+            _imageAfterAsBmp = e.image;            
             return null;
         }
 
+        void SetBusy(bool toThis)
+        {
+            if(toThis && !_busy)
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+            }
+            else if(!toThis && _busy)
+            {
+                Mouse.OverrideCursor = null;
+            }
+            _busy = toThis;
+        }
+
         #region FileButtons
-        //Actions for buttons for File Operations in gridFileOperations:
+        //Buttons on the far left bottom side of the GUI
         private void btOpen_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -82,7 +105,23 @@ namespace Pixelator_6000
             }
         }
 
-        int savedAlready = 0;
+        //Checkboxes in the same grid
+        private void checkInstant_Click(object sender, RoutedEventArgs e)
+        {
+            bool isChecked = (bool)checkInstant.IsChecked;
+
+            _applyNewSettingsAutomatically = isChecked;
+
+            btPixelsortApply.IsEnabled = !isChecked;
+            btPrismApply.IsEnabled = !isChecked;
+        }
+
+        private void checkCrop_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        
         private void btSave_Click(object sender, RoutedEventArgs e)
         {
             if(imageAfter.Source != null)
@@ -90,7 +129,7 @@ namespace Pixelator_6000
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Title = "Save image";
                 sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
-                sfd.FileName += "image_" + ++savedAlready;
+                sfd.FileName += "image_" + ++imagesSaved;
                 KnownImageFormat format = KnownImageFormat.png;
                 string plus = "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+";
                 if ((bool)sfd.ShowDialog())
@@ -115,6 +154,10 @@ namespace Pixelator_6000
                 }
             }
         }
+
+        
+
+
         public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
         {
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -151,23 +194,23 @@ namespace Pixelator_6000
 
         
         #region PixelsortControls
-        //Pixelsort settings
-        private bool PsBright = true;
-        private Orientation PsOrientation = Orientation.right;
-        private float PsLimit = 0.5f;
-        private bool applyNewSettingsAutomatically = false;
-        //TODO: Based not only on Saturation, but also Hue
+        
         private void cbPixelsortBrightness_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox lb = (ComboBox)sender;
             ComboBoxItem item = (ComboBoxItem)lb.SelectedItem;
             if (item.Content.ToString() == "Bright")
             {
-                PsBright = true;
+                psBright = true;
             }
             else
             {
-                PsBright = false;
+                psBright = false;
+            }
+
+            if(_applyNewSettingsAutomatically)
+            {
+                TryPixelsort();
             }
         }
 
@@ -177,38 +220,33 @@ namespace Pixelator_6000
             switch(orientationIndex)
             {
                 case 0:
-                    PsOrientation = Orientation.up;
+                    psOrientation = Orientation.up;
                     break;
                 case 1:
-                    PsOrientation = Orientation.down;
+                    psOrientation = Orientation.down;
                     break;
                 case 2:
-                    PsOrientation = Orientation.right;
+                    psOrientation = Orientation.right;
                     break;
                 case 3:
-                    PsOrientation = Orientation.left;
+                    psOrientation = Orientation.left;
                     break;
-            }            
+            }
+            
         }
 
         private void sliderPixelsortLimit_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             float newValue = (float)e.NewValue / 100;
-            if (fullyLoaded)
+            if (appFullyLoaded)
             {
                 lbPixelsortLimit.Text = "Limit: " + Math.Round(newValue,2).ToString();
-                PsLimit = newValue;
-                if(applyNewSettingsAutomatically)
+                psLimit = newValue;
+                if (_applyNewSettingsAutomatically)
                 {
                     TryPixelsort();
                 }
             }
-        }
-
-        private void checkBoxPixelsortAuto_Click(object sender, RoutedEventArgs e)
-        {
-            applyNewSettingsAutomatically = (bool)checkBoxPixelsortAuto.IsChecked;
-            btPixelsortApply.IsEnabled = !(bool)checkBoxPixelsortAuto.IsChecked;
         }
 
         private void btPixelsortApply_Click(object sender, RoutedEventArgs e)
@@ -220,12 +258,21 @@ namespace Pixelator_6000
         {
             if (_imageBeforeAsBmp != null)
             {
-                Task t = Task.Run(delegate {
-                    _logic.PixelsortByBrightness(PsBright,
-                    PsOrientation,
-                    PsLimit,
-                    new Bitmap(_imageBeforeAsBmp));
-                });
+                if(!_busy) 
+                {
+                    //imgAfter redraw switches _busy back to false after this pixelsort call finishes
+                    //otherwise when _applyNewSettingsAutomatically is true the cpu and memory go through the roof..
+                    //..trying to calculate too many similar things at once (when the user uses the sliderPixelsortLimit for example)
+                    SetBusy(true);
+
+                    //async so we don't block the UI thread
+                    Task t = Task.Run(delegate {
+                        _logic.PixelsortByBrightness(psBright,
+                        psOrientation,
+                        psLimit,
+                        new Bitmap(_imageBeforeAsBmp));
+                    });
+                }
             }
             else
             {
@@ -248,8 +295,12 @@ namespace Pixelator_6000
         private void prismSliderRX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //"Red offset X:0, Y:0"
-            rOffsetX = -(int)e.NewValue;
+            rOffsetX = (int)e.NewValue;
             lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+            if (_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void prismSliderRY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -257,49 +308,80 @@ namespace Pixelator_6000
             //minus because the Y slider should be the other way around: +Y means down, -Y means up
             rOffsetY = -(int)e.NewValue;
             lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+            if (_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            gOffsetX = -(int)e.NewValue;
+            gOffsetX = (int)e.NewValue;
             lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
+            if (_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void prismSliderGY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             gOffsetY = -(int)e.NewValue;
             lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
+            if (_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void prismSliderBX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            bOffsetX = -(int)e.NewValue;
+            bOffsetX = (int)e.NewValue;
             lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
+            if (_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void prismSliderBY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             bOffsetY = -(int)e.NewValue;
             lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
+            if(_applyNewSettingsAutomatically)
+            {
+                TryPrism();
+            }
         }
 
         private void btPrismApply_Click(object sender, RoutedEventArgs e)
         {
+            TryPrism();
+        }
 
+        void TryPrism()
+        {
             if (_imageBeforeAsBmp != null)
             {
-                    Task t = Task.Run(delegate {                        
+                if(!_busy)
+                {
+                    SetBusy(true);
+                    Task t = Task.Run(delegate {
                         _logic.Prism(rOffsetX, rOffsetY,
                                     gOffsetX, gOffsetY,
                                     bOffsetX, bOffsetY,
-                                    new Bitmap(_imageBeforeAsBmp));                        
+                                    new Bitmap(_imageBeforeAsBmp));
                     });
+                }
             }
             else
             {
                 MessageBox.Show("Load an image first.");
             }
         }
+
+
+
 
 
         #endregion PrismControls
