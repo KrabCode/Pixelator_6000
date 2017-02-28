@@ -78,10 +78,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BitmapConverter.cs" />
-    <Compile Include="BitmapChest.cs" />
-    <Compile Include="GaussianBlur.cs" />
-    <Compile Include="RedrawEventArgs.cs" />
+    <Compile Include="BitmapManipulation\BitmapConverter.cs" />
+    <Compile Include="BitmapManipulation\BitmapChest.cs" />
+    <Compile Include="BitmapManipulation\GaussianBlur.cs" />
+    <Compile Include="BitmapManipulation\RedrawEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -138,13 +138,13 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="blue-folder-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="arrow-transition-090.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="disk.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="blue-folder-horizontal-open.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="arrow-turn-090.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

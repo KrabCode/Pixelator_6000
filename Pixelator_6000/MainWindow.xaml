@@ -54,13 +54,13 @@
                 </Grid.RowDefinitions>
 
                 <Button x:Name="btOpen" Grid.Row="0" ToolTip="Load left image..." Click="btOpen_Click" >
-                    <Image Height="24" Source="blue-folder-horizontal-open.png" Stretch="Fill" Width="24"/>
+                    <Image Height="16" Source="blue-folder-open.png" Stretch="Fill" Width="16"/>
                 </Button>
                 <Button x:Name="btCommit" Grid.Row="1"  ToolTip="Commit right image to the left" Click="btCommit_Click" >
-                    <Image Height="24" Source="arrow-turn-090.png" Stretch="Fill" Width="24"/>
+                    <Image Height="16" Source="arrow-transition-090.png" Stretch="Fill" Width="16"/>
                 </Button>
                 <Button x:Name="btSave" Grid.Row="2" ToolTip="Save right image..." Click="btSave_Click">
-                    <Image Height="24" Source="disk.png" Stretch="Fill" Width="24"/>
+                    <Image Height="16" Source="disk.png" Stretch="Fill" Width="16"/>
                 </Button>
                 <CheckBox x:Name="checkInstant" Content="Instant" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5" Click="checkInstant_Click"/>
                 <CheckBox x:Name="checkCrop" Content="Crop" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Click="checkCrop_Click"/>

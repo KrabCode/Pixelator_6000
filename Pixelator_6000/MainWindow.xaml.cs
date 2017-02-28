@@ -21,15 +21,7 @@ using System.Runtime.InteropServices;
 using SuperfastBlur;
 
 namespace Pixelator_6000
-{
-
-    
-
-
-
-
-    
-    
+{   
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -164,11 +156,18 @@ namespace Pixelator_6000
 
          */
         #endregion README
-
+        
+        
+        /// <summary>
+        /// Use this event to return images from Logic to be rendered in the imageAfter control.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private EventHandler Logic_RedrawImageAfter(object sender, RedrawEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(new Action(() => {
-                imageAfter.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)e.image.Clone());
+                imageAfter.Source = BitmapConverter.Bitmap2BitmapSource(new Bitmap(e.image));
 
                 SetBusy(false);
             }));
