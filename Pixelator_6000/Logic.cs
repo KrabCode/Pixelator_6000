@@ -19,11 +19,13 @@ namespace Pixelator_6000
     {
         //If you're crafting a new effect, observe the rules outlined in MainWindow.xaml.cs!
         //Namely: return the resulting bitmap using the event RedrawImageAfter...
-        //...and pass your new modified bitmap to it as a constructor parameter of a new RedrawEventArgs
+        //...and pass your result to it as a constructor parameter of a new RedrawEventArgs
         //like so: RedrawImageAfter(this, new RedrawEventArgs(modifiedBitmap));
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
         public event RedrawEvent RedrawImageAfter;
-        
+
+        #region Effects
+
         public void PixelsortByBrightness(bool bright, Orientation pixelsortDirection, float limit, Bitmap orig)
         {
             //in order to implement pixelsort in four directions I just rotate the image prior to the main cycle
@@ -174,10 +176,14 @@ namespace Pixelator_6000
 
         public void Blur(Bitmap original, int intensity)
         {
-            GaussianBlur blur = new GaussianBlur(new Bitmap(original));
+            using (GaussianBlur blur = new GaussianBlur(original))
+            {
+                RedrawImageAfter(this, new RedrawEventArgs(blur.Process(intensity)));
+            }
             
-            RedrawImageAfter(this, new RedrawEventArgs(blur.Process(intensity)));
         }
+
+        #endregion
         
         private Bitmap Rotate(Bitmap bmp, Orientation orientation, bool reverse)
         {

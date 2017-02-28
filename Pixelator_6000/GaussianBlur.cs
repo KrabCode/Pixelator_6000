@@ -5,16 +5,20 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace SuperfastBlur
-{
-    public class GaussianBlur
-    {
-        private readonly int[] _red;
-        private readonly int[] _green;
-        private readonly int[] _blue;
 
-        private readonly int _width;
-        private readonly int _height;
+namespace SuperfastBlur
+{   
+    /// <summary>
+    /// Thanks to https://github.com/mdymel/superfastblur
+    /// </summary>
+    public class GaussianBlur : IDisposable
+    {
+        private int[] _red;
+        private int[] _green;
+        private int[] _blue;
+
+        private int _width;
+        private int _height;
 
         private readonly ParallelOptions _pOptions = new ParallelOptions { MaxDegreeOfParallelism = 16 };
 
@@ -170,5 +174,46 @@ namespace SuperfastBlur
                 }
             });
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    _red = null;
+                    _green = null;
+                    _blue = null;
+
+                    _width = 0;
+                    _height = 0;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~GaussianBlur() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

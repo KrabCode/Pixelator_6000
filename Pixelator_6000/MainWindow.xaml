@@ -90,7 +90,7 @@
                         <TextBlock Margin="10,16,0,0" TextWrapping="Wrap" Text="Brightness:" HorizontalAlignment="Left" Width="63" Grid.Row="1" RenderTransformOrigin="1.159,0.526" Height="19" VerticalAlignment="Top"/>
                         <TextBlock Margin="10,13,0,0" TextWrapping="Wrap" Text="Orientation:" HorizontalAlignment="Left" Width="63" Height="20" VerticalAlignment="Top"/>
                         <Slider x:Name="sliderPixelsortLimit" Value="50" Maximum="100" AutoToolTipPlacement="TopLeft" Grid.Column="1" ValueChanged="sliderPixelsortLimit_ValueChanged" VerticalAlignment="Center" SmallChange="1" LargeChange="20"/>
-                        <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 50" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
+                        <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 0,5" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
                         <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" Width="75" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
 
                     </Grid>
@@ -132,12 +132,12 @@
                             <ColumnDefinition Width="191*"/>
                         </Grid.ColumnDefinitions>
                         <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Width="156" Margin="17,15,0,0" SelectedIndex="0" Height="25" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
-                            <ComboBoxItem Content="Median"/>
                             <ComboBoxItem Content="Gauss"/>
-                            <ComboBoxItem Content="Pixelate"/>
+                            <ComboBoxItem Content="Not yet implemented"/>
+                            <ComboBoxItem Content="Not yet implemented"/>
                         </ComboBox>
-                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100" Minimum="3"/>
-                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 3" Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
+                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100"/>
+                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 0" Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
                         <Button x:Name="btBlurApply" Content="Apply" Grid.Column="2"  HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom" Click="btBlurApply_Click"/>
 
 

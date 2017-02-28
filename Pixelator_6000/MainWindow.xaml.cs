@@ -105,12 +105,12 @@ namespace Pixelator_6000
                     
                         if (_applyNewSettingsAutomatically)                                             //if the overlord wills it
                         {
-                            TryPrism();                                                                 //the user wills it
+                            TryEffect();                                                                //the user wills it
                         }
                     }
                 }
             
-            You must also use the Try<EFFECT> interface while the User interacts with the Apply button 
+            You must also use the Try<EFFECT> method while the User interacts with the Apply button 
             if you love the GUI and don't want it to freeze over,
             for it makes the user feel listened to and cared for with the immediate feedback.
             
@@ -149,17 +149,15 @@ namespace Pixelator_6000
 
         RedrawImageAfter(this, new RedrawEventArgs(resultingImage));
 
-        Which makes use of the Logic.RedrawImageAfter event 
-        to which this very class subscribes a bit further down
+        Making use of the Logic.RedrawImageAfter event 
+        to which this very class subscribes a few lines later
         and helps everyone talk only to who they're supposed to
         and nobody needs to get hurt or frozen.
         
         Once you observe these golden rules three, 
         there shall be no unexpected heavy traffic in the kingdom 
         and all will be well forever.
-
-                
-        }
+        
 
          */
         #endregion README
@@ -232,7 +230,11 @@ namespace Pixelator_6000
 
         private void checkCrop_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            if ((bool)checkCrop.IsChecked)
+            {
+                MessageBox.Show("Not yet implemented.");
+            }
+            
         }
         
 
@@ -245,7 +247,6 @@ namespace Pixelator_6000
                 sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
                 sfd.FileName += "image_" + ++imagesSaved;
                 KnownImageFormat format = KnownImageFormat.png;
-                string plus = "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+" + "+";
                 if ((bool)sfd.ShowDialog())
                 {
                     string ext = System.IO.Path.GetExtension(sfd.FileName);
@@ -279,7 +280,6 @@ namespace Pixelator_6000
                 ImageFormat finalFormat = ImageFormat.Png;
                 switch (format)
                 {
-
                     case KnownImageFormat.png:
                         {
                             finalFormat = ImageFormat.Png;
@@ -313,15 +313,8 @@ namespace Pixelator_6000
         {
             ComboBox lb = (ComboBox)sender;
             ComboBoxItem item = (ComboBoxItem)lb.SelectedItem;
-            if (item.Content.ToString() == "Bright")
-            {
-                psBright = true;
-            }
-            else
-            {
-                psBright = false;
-            }
-
+            psBright = (item.Content.ToString() == "Bright");
+            
             if(_applyNewSettingsAutomatically)
             {
                 TryPixelsort();
@@ -487,18 +480,16 @@ namespace Pixelator_6000
             }
         }
 
-
-
-
-
-
         #endregion PrismControls
 
         #region Blur
 
         private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if(appFullyLoaded && cbBlurMethods.SelectedIndex != 0)
+            {
+                MessageBox.Show("Not yet implemented");
+            }
         }
 
         private void sliderBlurMagnitude_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -520,13 +511,18 @@ namespace Pixelator_6000
 
         private void TryBlur()
         {
-            if(!_busy)
+            if(_imageBeforeAsBmp != null)
             {
-                SetBusy(true);
-                Task t = Task.Run(delegate {
-                    _logic.Blur(new Bitmap(_imageBeforeAsBmp), (int)sliderBlurMagnitude.Value);
-                });
-            }
+                if (!_busy)
+                {
+                    SetBusy(true);
+
+                    //Task doesn't work here. WHY?
+                    //Task t = Task.Run(delegate {
+                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), (int)sliderBlurMagnitude.Value);
+                    //});
+                }
+            }            
             else
             {
                 MessageBox.Show("Load an image first.");
