@@ -28,8 +28,7 @@ namespace Pixelator_6000
 
 
 
-    //If you modify this enum, also modify every switch that uses it
-    public enum KnownImageFormat { bmp, png, jpeg, gif };
+    
     
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -44,7 +43,8 @@ namespace Pixelator_6000
         private Logic _logic;
         private Bitmap _imageAfterAsBmp;
         private Bitmap _imageBeforeAsBmp;
-        private bool _applyNewSettingsAutomatically = false;        //The overlord himself, look busy!
+        private bool _applyNewSettingsAutomatically = false;        //The overlord himself, look busy!                                                                    
+        public enum KnownImageFormat { bmp, png, jpeg, gif };       //If you modify this enum, also modify every switch that uses it
 
         /// <summary>
         /// Do not set this manually - use the SetBusy(true) method!
@@ -89,35 +89,36 @@ namespace Pixelator_6000
         
         1) Be aware of the TryEffect obligation. Before you make calls to logic, consider the following:
 
-            The Logical mastermind does not like to be disturbed. It also helps to keep his memory and cpu costs low.    
-            Before you place a brand new memory and cpu intensive call to the mastermind, 
+            Logic does not like to be disturbed. It also helps to keep its memory and cpu costs low.    
+            Before you place a brand new memory and cpu intensive call to the almighty Logic, 
             requesting a new image be forged in the fires of the effect,
-            do so only if the Mastermind is not already busy with another task.
-            You can help the Mastermind in his efforts by appropriating the following spell
+            do so only if the Logic is not already busy with another task.
+            You can help the Logic in his efforts by appropriating the following spell
             while invoking his attention and sending out a background task to the Logical castle:            
 
             private void Try<EFFECT>()
             {
                 if (_imageBeforeAsBmp != null)                                                  //if there is an image loaded to work with
                 {
-                    if(!_busy)                                                                  //if and only if the mastermind is not busy 
+                    if(!_busy)                                                                  //if and only if the Logic is not busy 
                     {                                   
                         SetBusy(true);                                                          //he is now busy
                         Task t = Task.Run(delegate {                                            //dispatch a new Task to create a new Delegate 
-                            _logic.EFFECT(new Bitmap(_imageBeforeAsBmp), EFFECT PARAMETERS);    // who calls your Method of choice
-                        });
-                    }
-                else                                                                        //otherwise
+                            _logic.EFFECT(new Bitmap(_imageBeforeAsBmp), EFFECT PARAMETERS);    //who calls your Method of choice 
+                        });                                                                     // ! let not the parameters of your call to Logic be a question to the value of some slider in the GUI. 
+                    }                                                                           // -> everything must already be known: calling "magnitude" works, "slider.Value" doesn't
+                
+                else                                                                            //if there is no image to work with
                 {
-                    MessageBox.Show("Load an image first.");                                //be nice to the User
+                    MessageBox.Show("Load an image first.");                                    //be nice to the User
                 }
             }
 
-            For if the GUI sees the mastermind itself, it will go blind and the whole GUI realm will freeze three times over.
+            For if the GUI sees the Logic itself, it will go blind and the whole GUI realm will freeze three times over.
         
 
         2) Know that the calling underlings acting above 
-        shall never be graced by the voice of the Mastermind himself 
+        shall never be graced by the voice of the Logic itself
         and so they need not wait for his answer.
         He makes his results known from the Logic only using the following incantation:
 
