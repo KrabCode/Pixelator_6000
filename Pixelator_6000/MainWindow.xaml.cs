@@ -30,7 +30,7 @@ namespace Pixelator_6000
 
     //If you modify this enum, also modify every switch that uses it
     public enum KnownImageFormat { bmp, png, jpeg, gif };
-
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -66,6 +66,9 @@ namespace Pixelator_6000
         int bOffsetX = 0;
         int bOffsetY = 0;
 
+        //Blur settings
+        private enum BlurEffect { Gauss, Median, }
+        private int blurMagnitude = 0;
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -84,37 +87,7 @@ namespace Pixelator_6000
         |      If you add a new tab, or even a new glitch effect, be wary. You must obey these golden rules three.     |
         ---------------------------------------------------------------------------------------------------------------
         
-        1) Recognize the overlord _applyNewSettingsAutomatically:
-
-            for I have appointed him to watch over all the puny settings sliders and 
-            the overworked comboBoxes and the wee labels in the realm of gridEffectParameters
-            and under his rule, every puny underling must try to mobilize their respective 
-            parent glitch effect to immediate action, if the User wills it.
-
-            
-
-            Remember to add something like this under every little change event in settings
-            :
-
-                private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) //event made by the designer
-                {
-                    if (appFullyLoaded) //avoids some exceptions while starting the app coming from the slider's valuechanged event firing prematurely
-                    {
-                        parameterA = (int)e.NewValue;                                                  //save the user input relic
-                        lbEffectInfo.Content = "Parameter A: " + parameterA;                           //change the label text to reflect the new value
-                    
-                        if (_applyNewSettingsAutomatically)                                             //if the overlord wills it
-                        {
-                            TryEffect();                                                                //the user wills it
-                        }
-                    }
-                }
-            
-            You must also use the Try<EFFECT> method while the User interacts with the Apply button 
-            if you love the GUI and don't want it to freeze over,
-            for it makes the user feel listened to and cared for with the immediate feedback.
-            
-        2) Be aware of the TryEffect obligation. Before you make calls to logic, consider the following:
+        1) Be aware of the TryEffect obligation. Before you make calls to logic, consider the following:
 
             The Logical mastermind does not like to be disturbed. It also helps to keep his memory and cpu costs low.    
             Before you place a brand new memory and cpu intensive call to the mastermind, 
@@ -136,13 +109,14 @@ namespace Pixelator_6000
                     }
                 else                                                                        //otherwise
                 {
-                    MessageBox.Show("Load an image first.");                                //be nice to the user
+                    MessageBox.Show("Load an image first.");                                //be nice to the User
                 }
             }
 
             For if the GUI sees the mastermind itself, it will go blind and the whole GUI realm will freeze three times over.
-            
-        3) Know that the calling underlings acting above 
+        
+
+        2) Know that the calling underlings acting above 
         shall never be graced by the voice of the Mastermind himself 
         and so they need not wait for his answer.
         He makes his results known from the Logic only using the following incantation:
@@ -157,7 +131,35 @@ namespace Pixelator_6000
         Once you observe these golden rules three, 
         there shall be no unexpected heavy traffic in the kingdom 
         and all will be well forever.
+
         
+        3) Recognize the overlord _applyNewSettingsAutomatically:
+
+        for I have appointed him to watch over all the puny settings sliders and 
+        the overworked comboBoxes and the wee labels in the realm of gridEffectParameters
+        and under his rule, every puny underling must try to mobilize their respective 
+        parent glitch effect to immediate action, if the User wills it.            
+
+        Remember to add something like this under every little change event in settings
+        :
+
+            private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) //event made by the designer
+            {
+                if (appFullyLoaded) //avoids some exceptions while starting the app coming from the slider's valuechanged event firing prematurely
+                {
+                    parameterA = (int)e.NewValue;                                                  //save the User input relic
+                    lbEffectInfo.Content = "Parameter A: " + parameterA;                           //change the label text to reflect the new value
+                    
+                    if (_applyNewSettingsAutomatically)                                             //if the overlord wills it
+                    {
+                        TryEffect();                                                                //the User wills it
+                    }
+                }
+            }
+            
+        You must also use the Try<EFFECT> method while the User interacts with the Apply button 
+        if you love the GUI and don't want it to freeze over,
+        for it makes the User feel listened to and cared for with the immediate feedback.
 
          */
         #endregion README
@@ -483,7 +485,7 @@ namespace Pixelator_6000
         #endregion PrismControls
 
         #region Blur
-
+       
         private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(appFullyLoaded && cbBlurMethods.SelectedIndex != 0)
@@ -497,6 +499,7 @@ namespace Pixelator_6000
             if (appFullyLoaded)
             {
                 lbBlurMagnitude.Text = "Blur magnitude: " + (int)sliderBlurMagnitude.Value;
+                blurMagnitude = (int)sliderBlurMagnitude.Value;
                 if (_applyNewSettingsAutomatically)
                 {
                     TryBlur();
@@ -516,11 +519,9 @@ namespace Pixelator_6000
                 if (!_busy)
                 {
                     SetBusy(true);
-
-                    //Task doesn't work here. WHY?
-                    //Task t = Task.Run(delegate {
-                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), (int)sliderBlurMagnitude.Value);
-                    //});
+                    Task t = Task.Run(delegate {
+                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), blurMagnitude);
+                    });                    
                 }
             }            
             else
@@ -528,7 +529,7 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
-
         #endregion
+
     }
 }
