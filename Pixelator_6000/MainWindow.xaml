@@ -12,27 +12,21 @@
             <RowDefinition Height="10*"/>
             <RowDefinition Height="120*"/>
         </Grid.RowDefinitions>
-        <Grid x:Name="gridImages" Margin="0" Grid.Row="0" Background="#FF6C6C6C">
+        <Grid x:Name="gridImages" Margin="0" Grid.Row="0" AllowDrop="True" Background="#FF6C6C6C" Drop="gridImages_Drop">
             <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300*"/>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="300*"/>
             </Grid.ColumnDefinitions>
-                <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
-            
-
-            <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Grid.Row="0" Stretch="Uniform"/>
+            <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" Grid.Column="0" Grid.Row="0"/>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
-
-            <Image Grid.Column="2" Margin="10,10,10,0" VerticalAlignment="Top"/>
-
+            <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Stretch="Uniform" AllowDrop="True"/>
         </Grid>
-
+        
         <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="#FFECECEC"/>
-
+        
         <Grid x:Name="gridControlPanel" Margin="0" Grid.Row="2" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.5*"/>

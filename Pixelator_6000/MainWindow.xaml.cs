@@ -192,7 +192,22 @@ namespace Pixelator_6000
                 Mouse.OverrideCursor = null;
                 _busy = toThis;
             }
-            
+        }
+
+        /// <summary>
+        /// Responds to an image being dragged from elsewhere and dropped onto the upper grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridImages_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                //load the first item in the files that were dropped - if that item is an image
+                LoadImageFromFilePath(files[0]);
+            }
         }
 
         #region FileButtons
@@ -204,18 +219,11 @@ namespace Pixelator_6000
             ofd.Title = "Load image";
             if ((bool)ofd.ShowDialog())
             {
-
-                using (var bmpTemp = new Bitmap(ofd.FileName))
-                {
-                    var desiredBitmap = new Bitmap(bmpTemp);
-                    //Dialog success: load the file at ofd.FileName and load it to ImgBefore
-                    BitmapSource imgSource = BitmapConverter.Bitmap2BitmapSource(desiredBitmap);
-                    imageBefore.Source = imgSource;
-                    _imageBeforeAsBmp = BitmapConverter.BitmapSource2Bitmap(imgSource);
-                }
-                
+                LoadImageFromFilePath(ofd.FileName);                
             }
         }
+
+        
 
         private void btCommit_Click(object sender, RoutedEventArgs e)
         {
@@ -225,8 +233,7 @@ namespace Pixelator_6000
                 _imageBeforeAsBmp = _imageAfterAsBmp;
             }
         }
-
-        
+                
         //Checkboxes in the same grid:
         private void checkInstant_Click(object sender, RoutedEventArgs e)
         {
@@ -276,14 +283,28 @@ namespace Pixelator_6000
                 }
             }
         }
-        
+
+        private void LoadImageFromFilePath(string path)
+        {
+            using (FileStream inStream = File.Open(path, FileMode.Open))
+            {
+                var desiredBitmap = new Bitmap(inStream);
+                //but when calling Logic, it's a lot less work to pass a Bitmap rather than BitmapSource, so let's save that first
+                _imageBeforeAsBmp = new Bitmap(desiredBitmap);
+                //Dialog success: load the file at ofd.FileName and load it to ImgBefore
+                BitmapSource imgSource = BitmapConverter.Bitmap2BitmapSource(desiredBitmap);
+                //imageBefore.Source display it
+                imageBefore.Source = imgSource;
+            }
+        }
+
         /// <summary>
         /// Saves image to specified path without prompting, overwrites any file on filepath, it just doesn't care. Check these things before you call this.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="image"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
+        public void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
         {
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
@@ -566,5 +587,6 @@ namespace Pixelator_6000
         }
         #endregion
 
+        
     }
 }
