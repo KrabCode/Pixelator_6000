@@ -60,8 +60,7 @@ namespace Pixelator_6000
         int bOffsetX = 0;
         int bOffsetY = 0;
 
-        //Blur settings
-        
+        //Blur settings        
         private BlurEffect blurMethod = BlurEffect.Gauss;
         private int blurMagnitude = 0;
 
@@ -194,21 +193,8 @@ namespace Pixelator_6000
             }
         }
 
-        /// <summary>
-        /// Responds to an image being dragged from elsewhere and dropped onto the upper grid
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void gridImages_Drop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                //load the first item in the files that were dropped - if that item is an image
-                LoadImageFromFilePath(files[0]);
-            }
-        }
+        
 
         #region FileButtons
         //Buttons on the far left bottom side of the GUI
@@ -219,7 +205,8 @@ namespace Pixelator_6000
             ofd.Title = "Load image";
             if ((bool)ofd.ShowDialog())
             {
-                LoadImageFromFilePath(ofd.FileName);                
+                LoadImageFromFilePath(ofd.FileName);
+                PopulateImageMetadataGridWithImageMetadata(_imageBeforeAsBmp);
             }
         }
 
@@ -242,14 +229,7 @@ namespace Pixelator_6000
             _applyNewSettingsAutomatically = isChecked;            
         }
 
-        private void checkCrop_Click(object sender, RoutedEventArgs e)
-        {
-            if ((bool)checkCrop.IsChecked)
-            {
-                MessageBox.Show("Not yet implemented.");
-            }
-            
-        }
+        
         
 
         private void btSave_Click(object sender, RoutedEventArgs e)
@@ -292,13 +272,20 @@ namespace Pixelator_6000
         {
             using (FileStream inStream = File.Open(path, FileMode.Open))
             {
-                var desiredBitmap = new Bitmap(inStream);
-                //but when calling Logic, it's a lot less work to pass a Bitmap rather than BitmapSource, so let's save that first
-                _imageBeforeAsBmp = new Bitmap(desiredBitmap);
-                //Dialog success: load the file at ofd.FileName and load it to ImgBefore
-                BitmapSource imgSource = BitmapConverter.Bitmap2BitmapSource(desiredBitmap);
-                //imageBefore.Source display it
-                imageBefore.Source = imgSource;
+                try
+                {
+                    var desiredBitmap = new Bitmap(inStream);
+                    //but when calling Logic, it's a lot less work to pass a Bitmap rather than BitmapSource, so let's save that first
+                    _imageBeforeAsBmp = new Bitmap(desiredBitmap);
+                    //Dialog success: load the file at ofd.FileName and load it to ImgBefore
+                    BitmapSource imgSource = BitmapConverter.Bitmap2BitmapSource(desiredBitmap);
+                    //imageBefore.Source display it
+                    imageBefore.Source = imgSource;
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
             }
         }
 
@@ -347,8 +334,33 @@ namespace Pixelator_6000
         #endregion FileButtons
 
         
+        /// <summary>
+        /// Responds to an image being dragged from elsewhere and dropped onto the upper grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridImages_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                //load the first item in the files that were dropped - if that item is an image
+                LoadImageFromFilePath(files[0]);
+                PopulateImageMetadataGridWithImageMetadata(_imageBeforeAsBmp);
+            }
+        }
+
+        /// <summary>
+        /// Populates the semi transparent grid of labels in the top left corner of the app with detailed image information
+        /// </summary>
+        private void PopulateImageMetadataGridWithImageMetadata(Bitmap image)
+        {           
+            lbImgInfo_0.Content = "Resolution: " + image.Width + "x" + image.Height;
+        }
+
         #region PixelsortControls
-        
+
         private void cbPixelsortBrightness_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox lb = (ComboBox)sender;
@@ -615,6 +627,7 @@ namespace Pixelator_6000
             }
         }
         #endregion
+
 
         
     }

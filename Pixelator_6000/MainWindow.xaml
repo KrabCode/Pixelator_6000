@@ -23,6 +23,16 @@
             <Image x:Name="imageBefore" Margin="10" Stretch="Uniform" Grid.Column="0" Grid.Row="0"/>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
             <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Stretch="Uniform" AllowDrop="True"/>
+            <Grid x:Name="gridImageMetadata" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" OpacityMask="#CC000000" Background="#995F5959" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label x:Name="lbImgInfo_0" Content="" Grid.Row="0" Foreground="White"></Label>
+            </Grid>
+
+
+
         </Grid>
 
         <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="#FFECECEC"/>
@@ -57,7 +67,6 @@
                     <Image Height="16" Source="disk.png" Stretch="Fill" Width="16"/>
                 </Button>
                 <CheckBox x:Name="checkInstant" Content="Instant" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5" Click="checkInstant_Click"/>
-                <CheckBox x:Name="checkCrop" Content="Crop" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Click="checkCrop_Click"/>
             </Grid>
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
             <TabControl x:Name="gridEffectParameters" Grid.Column="2" Margin="5,5,5,5">
@@ -101,17 +110,17 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <Slider x:Name="prismSliderRX" Minimum="-10" Margin="19,0,5,0" ValueChanged="prismSliderRX_ValueChanged" Height="24" VerticalAlignment="Top" />
-                        <Slider x:Name="prismSliderRY"  Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Minimum="-10" ValueChanged="prismSliderRY_ValueChanged" Margin="1,0,0,0"/>
-                        <Label x:Name="lbPrismInfotextR" Content="Red offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="29,23,0,0" />
+                        <Slider x:Name="prismSliderRX" Minimum="-10" Margin="19,0,66,0" ValueChanged="prismSliderRX_ValueChanged" Height="23" VerticalAlignment="Top" />
+                        <Slider x:Name="prismSliderRY"  Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Minimum="-10" ValueChanged="prismSliderRY_ValueChanged" Margin="1,0,0,43" Width="21"/>
+                        <Label x:Name="lbPrismInfotextR" Content="Red offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="26,23,0,0" />
 
-                        <Slider x:Name="prismSliderGX"  Grid.Column="1" Minimum="-10" Margin="0,0,24,0" ValueChanged="prismSliderGX_ValueChanged" Height="28" VerticalAlignment="Top"/>
-                        <Slider x:Name="prismSliderGY"  Grid.Column="1" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderGY_ValueChanged" Width="23"/>
-                        <Label x:Name="lbPrismInfotextG" Grid.Column="1" Content="Green offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,23,0,0" />
+                        <Slider x:Name="prismSliderGX"  Grid.Column="1" Minimum="-10" Margin="57,0,24,0" ValueChanged="prismSliderGX_ValueChanged" Height="28" VerticalAlignment="Top"/>
+                        <Slider x:Name="prismSliderGY"  Grid.Column="1" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderGY_ValueChanged" Width="23" Margin="0,0,0,48"/>
+                        <Label x:Name="lbPrismInfotextG" Grid.Column="1" Content="Green offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,23,0,0"  />
 
-                        <Slider x:Name="prismSliderBX" Grid.Column="2" Minimum="-10" Margin="0,0,24,0" ValueChanged="prismSliderBX_ValueChanged" Height="24" VerticalAlignment="Top"/>
-                        <Slider x:Name="prismSliderBY"  Grid.Column="2" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderBY_ValueChanged" Width="23"/>
-                        <Label x:Name="lbPrismInfotextB" Grid.Column="2" Content="Blue offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,43,0,0" />
+                        <Slider x:Name="prismSliderBX" Grid.Column="2" Minimum="-10" Margin="69,-1,21,0" ValueChanged="prismSliderBX_ValueChanged" Height="24" VerticalAlignment="Top"/>
+                        <Slider x:Name="prismSliderBY"  Grid.Column="2" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" Minimum="-10" ValueChanged="prismSliderBY_ValueChanged" Width="23" Margin="0,0,0,47"/>
+                        <Label x:Name="lbPrismInfotextB" Grid.Column="2" Content="Blue offset X:0, Y:0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,21,0,0" />
                         <Button x:Name="btPrismApply" Content="Apply" Grid.Column="3" Click="btPrismApply_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Height="20" />
                     </Grid>
                 </TabItem>
