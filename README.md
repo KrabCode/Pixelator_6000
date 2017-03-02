@@ -12,3 +12,4 @@ Or just open the project in Visual studio 2015+ and build it.
 
 With thanks to:
 https://github.com/mdymel/superfastblur
+Dewald Esterhuizen and his https://softwarebydefault.com/2013/06/09/image-blur-filters/
