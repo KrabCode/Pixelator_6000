@@ -260,7 +260,7 @@ namespace Pixelator_6000
                 sfd.Title = "Save image";
                 sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
                 sfd.FileName += "image_" + ++imagesSaved;
-                KnownImageFormat format = KnownImageFormat.png;
+                KnownImageFormat format;
                 if ((bool)sfd.ShowDialog())
                 {
                     string ext = System.IO.Path.GetExtension(sfd.FileName);
@@ -275,6 +275,10 @@ namespace Pixelator_6000
                         case ".gif":
                             format = KnownImageFormat.gif;
                             break;
+                        default:                            
+                            format = KnownImageFormat.png;
+                            break;
+                            
                     }
 
                     SaveImageToFile(sfd.FileName,
@@ -333,7 +337,7 @@ namespace Pixelator_6000
                         }
                     default:
                         {
-                            MessageBox.Show("Unknown image format!");
+                            finalFormat = ImageFormat.Png;
                             break;
                         }
                 }
@@ -527,26 +531,32 @@ namespace Pixelator_6000
        
         private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox blurMethods = (ComboBox)sender;
-            ComboBoxItem selectedMethod = (ComboBoxItem)blurMethods.SelectedItem;
-            string selectedMethodName = (string)selectedMethod.Content;
-            switch(selectedMethodName)
+            if(appFullyLoaded)
             {
-                case "Gauss":
-                    {
-                        blurMethod = BlurEffect.Gauss;
-                        break;
-                    }
-                case "Median":
-                    {
-                        blurMethod = BlurEffect.Median;
-                        break;
-                    }
-                default:
-                    {
-                        MessageBox.Show("Unknown blur method!");
-                        break;
-                    }
+                ComboBox blurMethods = (ComboBox)sender;
+                ComboBoxItem selectedMethod = (ComboBoxItem)blurMethods.SelectedItem;
+                string selectedMethodName = (string)selectedMethod.Content;
+                switch (selectedMethodName)
+                {
+                    case "Gauss blur":
+                        {
+                            blurMethod = BlurEffect.Gauss;
+                            lbMedianWarning.Visibility = Visibility.Hidden;
+                            break;
+                        }
+                    case "Median blur":
+                        {
+                            blurMethod = BlurEffect.Median;
+                            lbMedianWarning.Visibility = Visibility.Visible;
+                            break;
+                        }
+                    default:
+                        {
+                            lbMedianWarning.Visibility = Visibility.Hidden;
+                            MessageBox.Show("Unknown blur method!");
+                            break;
+                        }
+                }
             }
         }
 
@@ -554,8 +564,10 @@ namespace Pixelator_6000
         {
             if (appFullyLoaded)
             {
+
                 lbBlurMagnitude.Text = "Blur magnitude: " + (int)sliderBlurMagnitude.Value;
                 blurMagnitude = (int)sliderBlurMagnitude.Value;
+                
                 if (_applyNewSettingsAutomatically)
                 {
                     TryBlur();
@@ -575,9 +587,26 @@ namespace Pixelator_6000
                 if (!_busy)
                 {
                     SetBusy(true);
-                    Task t = Task.Run(delegate {
-                        _logic.BlurPicker(new Bitmap(_imageBeforeAsBmp), blurMagnitude, blurMethod);
-                    });                    
+
+                    switch (blurMethod)
+                    {
+                        case BlurEffect.Gauss:
+                            {
+                                Task t = Task.Run(delegate {
+                                    _logic.BlurGauss(_imageBeforeAsBmp, blurMagnitude);
+                                });
+                                
+                                break;
+                            }
+                        case BlurEffect.Median:
+                            {
+                                Task t = Task.Run(delegate {
+                                    _logic.BlurMedian(_imageBeforeAsBmp, blurMagnitude);
+                                });
+                                break;
+                            }
+                    }
+                                                
                 }
             }            
             else

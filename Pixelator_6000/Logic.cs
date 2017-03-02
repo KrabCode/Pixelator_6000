@@ -23,11 +23,11 @@ namespace Pixelator_6000
         //like so: RedrawImageAfter(this, new RedrawEventArgs(modifiedBitmap));
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
         public event RedrawEvent RedrawImageAfter;
-
         
-
+        
         public void PixelsortByBrightness(bool bright, Orientation pixelsortDirection, float limit, Bitmap orig)
         {
+            
             //in order to implement pixelsort in four directions I just rotate the image prior to the main cycle
 
             //base image orientation = up
@@ -175,30 +175,9 @@ namespace Pixelator_6000
         }
 
         #region BlurEffects
-        public void BlurPicker(Bitmap original, int intensity, BlurEffect method)
-        {
-            switch (method)
-            {
-                case BlurEffect.Gauss:
-                    {
-                        BlurGauss(original, intensity);
-                        break;
-                    }
-                case BlurEffect.Median:
-                    {
-                        BlurMedian(original, intensity);
-                        break;
-                    }
-                default:
-                    {
-                        //maybe show an error here? maybe not necessary, the combobox already checks whether the blur effect is known.
-                        break;
-                    }
-            }
+        
 
-        }
-
-        private void BlurGauss(Bitmap original, int intensity)
+        public void BlurGauss(Bitmap original, int intensity)
         {
             using (GaussianBlur gauss = new GaussianBlur(original))
             {
@@ -206,12 +185,10 @@ namespace Pixelator_6000
             }
         }
 
-        private void BlurMedian(Bitmap original, int intensity)
+        public void BlurMedian(Bitmap original, int intensity)
         {
-            using (Bitmap result = MedianBlur.MedianFilter(original, intensity))
-            {
-                RedrawImageAfter(this, new RedrawEventArgs(result));
-            }
+            Bitmap result = original.MedianFilter(intensity);
+            RedrawImageAfter(this, new RedrawEventArgs(result));
         }
 
         #endregion

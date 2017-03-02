@@ -13,9 +13,9 @@ namespace Pixelator_6000
     //https://softwarebydefault.com/2013/06/09/image-blur-filters/
 
     public static class MedianBlur
-    {        
-        public static Bitmap MedianFilter(this Bitmap sourceBitmap,
-                                   int matrixSize)
+    {
+        
+        public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize)
         {
             BitmapData sourceData =
                        sourceBitmap.LockBits(new Rectangle(0, 0,

@@ -24,9 +24,9 @@
             <GridSplitter HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" Grid.Column="1" Background="#FFECECEC"/>
             <Image x:Name="imageAfter" Margin="10" Grid.Column="2" Stretch="Uniform" AllowDrop="True"/>
         </Grid>
-        
+
         <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="#FFECECEC"/>
-        
+
         <Grid x:Name="gridControlPanel" Margin="0" Grid.Row="2" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.5*"/>
@@ -125,21 +125,17 @@
                             <ColumnDefinition Width="250*"/>
                             <ColumnDefinition Width="191*"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Width="156" Margin="17,15,0,0" SelectedIndex="0" Height="25" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
+                        <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Margin="10,10,0,0" SelectedIndex="0" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
                             <ComboBoxItem Content="Gauss blur"/>
                             <ComboBoxItem Content="Median blur"/>
                         </ComboBox>
-                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100"/>
-                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 0" Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>
+                        <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100"/>
+                        <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 0" Margin="25,42,80,0" VerticalAlignment="Top"/>
                         <Button x:Name="btBlurApply" Content="Apply" Grid.Column="2"  HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom" Click="btBlurApply_Click"/>
-
-
+                        <Label x:Name="lbMedianWarning" Visibility="Hidden" Content="May take a few minutes&#xD;&#xA;with high resolution images&#xD;&#xA;and/or high magnitudes" Margin="10,40,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                     </Grid>
                 </TabItem>
             </TabControl>
-
-
-
         </Grid>
 
 
