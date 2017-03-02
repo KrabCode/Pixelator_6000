@@ -37,6 +37,7 @@ namespace Pixelator_6000
         private Logic _logic;
         private Bitmap _imageAfterAsBmp;
         private Bitmap _imageBeforeAsBmp;
+        private string _imageName;
         private bool _applyNewSettingsAutomatically = false;        //The overlord himself, look busy!                                                                    
         public enum KnownImageFormat { bmp, png, jpeg, gif };       //If you modify this enum, also modify every switch that uses it
 
@@ -45,7 +46,6 @@ namespace Pixelator_6000
         /// </summary>
         private bool _busy = false;
         private bool appFullyLoaded = false;
-        private int imagesSaved = 0;
 
         //Pixelsort settings
         private bool psBright = true;
@@ -203,14 +203,28 @@ namespace Pixelator_6000
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Image (*.png;*.bmp;*.gif;*.jpg;*.jpeg)|*.png;*.bmp;*.gif;*.jpg;*.jpeg|All files (*.*)|*.*";
             ofd.Title = "Load image";
+            ofd.Multiselect = false;
+
             if ((bool)ofd.ShowDialog())
             {
+
                 LoadImageFromFilePath(ofd.FileName);
                 PopulateImageMetadataGridWithImageMetadata(_imageBeforeAsBmp);
+                /*
+                _imageName = "";
+                List<string> splitName = new List<string>();
+                splitName = ofd.SafeFileName.Split('.').ToList();
+                splitName.RemoveAt(splitName.Count - 1);
+                splitName.RemoveAt(splitName.Count - 2);
+                foreach(string charsBetweenDots in splitName)
+                {
+                    _imageName += charsBetweenDots + ".";
+                }
+                _imageName.Remove(_imageName.Length - 1, 1);*/
             }
         }
 
-        
+                
 
         private void btCommit_Click(object sender, RoutedEventArgs e)
         {
@@ -225,7 +239,6 @@ namespace Pixelator_6000
         private void checkInstant_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = (bool)checkInstant.IsChecked;
-
             _applyNewSettingsAutomatically = isChecked;            
         }
 
@@ -238,8 +251,14 @@ namespace Pixelator_6000
             {
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Title = "Save image";
-                sfd.Filter = "Portable Network Graphic|*.png|Lossless bitmap image|*.bmp|Jpeg compression|*.jpg|Graphic Interchange Format|*.gif";
-                sfd.FileName += "image_" + ++imagesSaved;
+                sfd.Filter = ".png|*.png|.bmp|*.bmp|.jpg|*.jpg|.gif(stationary)|*.gif";
+                
+                //find the best possible name for the new file, so that the user doesn't have to type anything or overwrite when lazy
+                string initialDirectory =  sfd.InitialDirectory;
+
+                
+
+                sfd.FileName += _imageName + "Image_" + GetVacantSuffix();
                 KnownImageFormat format;
                 if ((bool)sfd.ShowDialog())
                 {
@@ -266,6 +285,28 @@ namespace Pixelator_6000
                         format);
                 }
             }
+        }
+
+        private string GetVacantSuffix()
+        {
+            string name = "";
+            
+            for(int i = 0; i < 8; i++)
+            {
+                name += GetLetter();
+            }
+
+            return name;
+        }
+        Random _random = new Random();
+
+        public char GetLetter()
+        {
+            // This method returns a random lowercase letter.
+            // ... Between 'a' and 'z' inclusize.
+            int num = _random.Next(0, 26); // Zero to 25
+            char let = (char)('a' + num);
+            return let;
         }
 
         private void LoadImageFromFilePath(string path)
@@ -354,8 +395,8 @@ namespace Pixelator_6000
         /// <summary>
         /// Populates the semi transparent grid of labels in the top left corner of the app with detailed image information
         /// </summary>
-        private void PopulateImageMetadataGridWithImageMetadata(Bitmap image)
-        {           
+        private void PopulateImageMetadataGridWithImageMetadata(Bitmap image) { 
+                   
             lbImgInfo_0.Content = "Resolution: " + image.Width + "x" + image.Height;
         }
 
