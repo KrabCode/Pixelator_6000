@@ -20,6 +20,8 @@ using System.Windows.Interop;
 using System.Runtime.InteropServices;
 using SuperfastBlur;
 
+public enum BlurEffect { Gauss, Median, }                  //If you modify this enum, also modify every switch that uses it
+
 namespace Pixelator_6000
 {   
     /// <summary>
@@ -59,7 +61,8 @@ namespace Pixelator_6000
         int bOffsetY = 0;
 
         //Blur settings
-        private enum BlurEffect { Gauss, Median, }
+        
+        private BlurEffect blurMethod = BlurEffect.Gauss;
         private int blurMagnitude = 0;
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -109,7 +112,7 @@ namespace Pixelator_6000
             For if the GUI sees the Logic itself, it will go blind and the whole GUI realm will freeze three times over.
         
 
-        2) Know that the calling underlings acting above 
+        2) Know that the caller underlings acting above 
         shall never be graced by the voice of the Logic itself
         and so they need not wait for his answer.
         He makes his results known from the Logic only using the following incantation:
@@ -121,11 +124,7 @@ namespace Pixelator_6000
         and helps everyone talk only to who they're supposed to
         and nobody needs to get hurt or frozen.
         
-        Once you observe these golden rules three, 
-        there shall be no unexpected heavy traffic in the kingdom 
-        and all will be well forever.
-
-        
+                        
         3) Recognize the overlord _applyNewSettingsAutomatically:
 
         for I have appointed him to watch over all the puny settings sliders and 
@@ -133,19 +132,18 @@ namespace Pixelator_6000
         and under his rule, every puny underling must try to mobilize their respective 
         parent glitch effect to immediate action, if the User wills it.            
 
-        Remember to add something like this under every little change event in settings
-        :
+        Remember to add something like this under every little change event in settings:
 
-            private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) //event made by the designer
+            private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) 
             {
-                if (appFullyLoaded) //avoids some exceptions while starting the app coming from the slider's valuechanged event firing prematurely
+                if (appFullyLoaded)     //avoids some exceptions while starting the app coming from the slider's valuechanged event firing prematurely
                 {
-                    parameterA = (int)e.NewValue;                                                  //save the User input relic
-                    lbEffectInfo.Content = "Parameter A: " + parameterA;                           //change the label text to reflect the new value
+                    parameterA = (int)e.NewValue;                                       //save the User input relic
+                    lbEffectInfo.Content = "Parameter A: " + parameterA;                //change the label text to reflect the new value
                     
-                    if (_applyNewSettingsAutomatically)                                             //if the overlord wills it
+                    if (_applyNewSettingsAutomatically)                                 //if the overlord wills it
                     {
-                        TryEffect();                                                                //the User wills it
+                        TryEffect();                                                    //the User wills it
                     }
                 }
             }
@@ -154,10 +152,13 @@ namespace Pixelator_6000
         if you love the GUI and don't want it to freeze over,
         for it makes the User feel listened to and cared for with the immediate feedback.
 
+        Once you observe these golden rules three, 
+        there shall be no unexpected heavy traffic in the kingdom 
+        and all will be well forever.
          */
         #endregion README
-        
-        
+
+
         /// <summary>
         /// Use this event to return images from Logic to be rendered in the imageAfter control.
         /// </summary>
@@ -174,7 +175,11 @@ namespace Pixelator_6000
             _imageAfterAsBmp = e.image;            
             return null;
         }
-        
+
+        /// <summary>
+        /// Sets the cursor to its "Wait" animation as long work begins, sets it back as it ends in Logic_RedrawImageAfter.
+        /// </summary>
+        /// <param name="toThis"></param>
         void SetBusy(bool toThis)
         {
             if(toThis && !_busy)
@@ -271,10 +276,13 @@ namespace Pixelator_6000
                 }
             }
         }
-
         
-
-
+        /// <summary>
+        /// Saves image to specified path without prompting, overwrites any file on filepath, it just doesn't care. Check these things before you call this.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="image"></param>
+        /// <param name="format"></param>
         public static void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
         {
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -300,6 +308,11 @@ namespace Pixelator_6000
                     case KnownImageFormat.jpeg:
                         {
                             finalFormat = ImageFormat.Jpeg;
+                            break;
+                        }
+                    default:
+                        {
+                            MessageBox.Show("Unknown image format!");
                             break;
                         }
                 }
@@ -340,6 +353,11 @@ namespace Pixelator_6000
                 case 3:
                     psOrientation = Orientation.left;
                     break;
+                default:
+                    {
+                        MessageBox.Show("Unknown orientation!");
+                        break;
+                    }
             }
             
         }
@@ -349,7 +367,7 @@ namespace Pixelator_6000
             float newValue = (float)e.NewValue / 100;
             if (appFullyLoaded)
             {
-                lbPixelsortLimit.Text = "Limit: " + Math.Round(newValue,2).ToString();
+                lbPixelsortLimit.Text = "Limit: " + (float)e.NewValue / 100;
                 psLimit = newValue;
                 if (_applyNewSettingsAutomatically)
                 {
@@ -488,9 +506,26 @@ namespace Pixelator_6000
        
         private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(appFullyLoaded && cbBlurMethods.SelectedIndex != 0)
+            ComboBox blurMethods = (ComboBox)sender;
+            ComboBoxItem selectedMethod = (ComboBoxItem)blurMethods.SelectedItem;
+            string selectedMethodName = (string)selectedMethod.Content;
+            switch(selectedMethodName)
             {
-                MessageBox.Show("Not yet implemented");
+                case "Gauss":
+                    {
+                        blurMethod = BlurEffect.Gauss;
+                        break;
+                    }
+                case "Median":
+                    {
+                        blurMethod = BlurEffect.Median;
+                        break;
+                    }
+                default:
+                    {
+                        MessageBox.Show("Unknown blur method!");
+                        break;
+                    }
             }
         }
 
@@ -520,7 +555,7 @@ namespace Pixelator_6000
                 {
                     SetBusy(true);
                     Task t = Task.Run(delegate {
-                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), blurMagnitude);
+                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), blurMagnitude, blurMethod);
                     });                    
                 }
             }            

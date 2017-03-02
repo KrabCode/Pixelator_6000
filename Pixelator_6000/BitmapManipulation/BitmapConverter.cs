@@ -29,7 +29,6 @@ namespace Pixelator_6000
                     enc.Frames.Add(BitmapFrame.Create(bitmapImage));
                     enc.Save(outStream);
                     bitmap = new Bitmap(outStream);
-                    outStream.Close();
                 }
                 
                 return new Bitmap(bitmap);
@@ -71,7 +70,6 @@ namespace Pixelator_6000
                 encoder.Save(ms);
                 ms.Seek(0, SeekOrigin.Begin);
                 result = new Bitmap(ms);
-                ms.Close();
             }
             return result;
         }

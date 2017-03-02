@@ -133,7 +133,7 @@
                         </Grid.ColumnDefinitions>
                         <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Width="156" Margin="17,15,0,0" SelectedIndex="0" Height="25" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
                             <ComboBoxItem Content="Gauss"/>
-                            <ComboBoxItem Content="Not yet implemented"/>
+                            <ComboBoxItem Content="Median"/>
                             <ComboBoxItem Content="Not yet implemented"/>
                         </ComboBox>
                         <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100"/>

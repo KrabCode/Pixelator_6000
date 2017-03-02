@@ -14,7 +14,7 @@ namespace Pixelator_6000
 {
     
     public enum Orientation { up, right, down, left };
-    
+
     class Logic
     {
         //If you're crafting a new effect, observe the rules outlined in MainWindow.xaml.cs!
@@ -64,7 +64,7 @@ namespace Pixelator_6000
                     {
                         desiredImageDirection = Orientation.down;
                         break;
-                    }               
+                    }
             }
 
             //and rotate the whole image so that the sorting algorithm can remain the same, it's complicated enough as it is
@@ -86,7 +86,7 @@ namespace Pixelator_6000
             {
                 //iterate through the columns horizontally
                 for (int x = 0; x < chest.Width; x++)
-                {   
+                {
                     //---->
                     //---->
                     //---->
@@ -121,14 +121,14 @@ namespace Pixelator_6000
 
             //rotate the whole image back before you return it
             orig = Rotate(orig, desiredImageDirection, reverse: true);
-            
+
             //fire the event that redraws the modified image display on a UI thread in MainWindow.xaml.cs
             RedrawImageAfter(this, new RedrawEventArgs(orig));
         }
 
         public void Prism(int rOffsetX, int rOffsetY, int gOffsetX, int gOffsetY, int bOffsetX, int bOffsetY, Bitmap orig)
         {
-            if(orig != null)
+            if (orig != null)
             {
                 Bitmap toDraw = new Bitmap(orig, orig.Size);
                 BitmapChest origChest = new BitmapChest((Bitmap)orig);
@@ -139,7 +139,7 @@ namespace Pixelator_6000
                 drawChest.LockBits();
 
                 Rectangle origSize = new Rectangle(0, 0, origChest.Width, origChest.Height);
-                
+
                 unsafe
                 {
                     //for the height of this image
@@ -157,7 +157,7 @@ namespace Pixelator_6000
                                 origSize.Contains(new System.Drawing.Point(x + bOffsetX, y + bOffsetY)))
                             {
                                 //...adjust for the offset...
-                                newColor = Color.FromArgb(origColor.A,                                
+                                newColor = Color.FromArgb(origColor.A,
                                     origChest.GetPixel(x + rOffsetX, y + rOffsetY).R,
                                     origChest.GetPixel(x + gOffsetX, y + gOffsetY).G,
                                     origChest.GetPixel(x + bOffsetX, y + bOffsetY).B);
@@ -171,16 +171,43 @@ namespace Pixelator_6000
                     drawChest.UnlockBits();
                     RedrawImageAfter(this, new RedrawEventArgs(toDraw));
                 }
-            }                       
+            }
         }
 
-        public void Blur(Bitmap original, int intensity)
+        public void Blur(Bitmap original, int intensity, BlurEffect method)
+        {
+            switch (method)
+            {
+                case BlurEffect.Gauss:
+                    {
+                        BlurGauss(original, intensity);
+                        break;
+                    }
+                case BlurEffect.Median:
+                    {
+                        BlurMedian(original, intensity);
+                        break;
+                    }
+                default:
+                    {
+                        //maybe show an error here? maybe not necessary, the combobox already checks whether the blur effect is known.
+                        break;
+                    }
+            }
+
+        }
+
+        public void BlurGauss(Bitmap original, int intensity)
         {
             using (GaussianBlur blur = new GaussianBlur(original))
             {
                 RedrawImageAfter(this, new RedrawEventArgs(blur.Process(intensity)));
             }
-            
+        }
+
+        public void BlurMedian(Bitmap original, int intensity)
+        {
+
         }
 
         #endregion
