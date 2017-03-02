@@ -576,7 +576,7 @@ namespace Pixelator_6000
                 {
                     SetBusy(true);
                     Task t = Task.Run(delegate {
-                        _logic.Blur(new Bitmap(_imageBeforeAsBmp), blurMagnitude, blurMethod);
+                        _logic.BlurPicker(new Bitmap(_imageBeforeAsBmp), blurMagnitude, blurMethod);
                     });                    
                 }
             }            

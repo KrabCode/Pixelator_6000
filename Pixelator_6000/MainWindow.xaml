@@ -126,9 +126,8 @@
                             <ColumnDefinition Width="191*"/>
                         </Grid.ColumnDefinitions>
                         <ComboBox x:Name="cbBlurMethods" HorizontalAlignment="Left" Width="156" Margin="17,15,0,0" SelectedIndex="0" Height="25" VerticalAlignment="Top" SelectionChanged="cbBlurMethods_SelectionChanged">
-                            <ComboBoxItem Content="Gauss"/>
-                            <ComboBoxItem Content="Median"/>
-                            <ComboBoxItem Content="Not yet implemented"/>
+                            <ComboBoxItem Content="Gauss blur"/>
+                            <ComboBoxItem Content="Median blur"/>
                         </ComboBox>
                         <Slider x:Name="sliderBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" Margin="24,15,22,0" Height="36" VerticalAlignment="Top" ValueChanged="sliderBlurMagnitude_ValueChanged" Maximum="100"/>
                         <TextBlock x:Name="lbBlurMagnitude" Grid.Column="1" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Blur magnitude: 0" Margin="25,42,80,0" Height="20" VerticalAlignment="Top"/>

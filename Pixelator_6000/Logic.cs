@@ -24,7 +24,7 @@ namespace Pixelator_6000
         public delegate EventHandler RedrawEvent(object sender, RedrawEventArgs e);
         public event RedrawEvent RedrawImageAfter;
 
-        #region Effects
+        
 
         public void PixelsortByBrightness(bool bright, Orientation pixelsortDirection, float limit, Bitmap orig)
         {
@@ -71,7 +71,7 @@ namespace Pixelator_6000
             orig = Rotate(orig, desiredImageDirection, reverse: false);
 
             //this chest boosts performance by orders of magnitude as opposed to Bitmap.getPixel(x, y) and Bitmap.setPixel(x, y, Color)
-            //only thing to keep in mind is to lock it prior to modification and unlock it afterwards.
+            //only thing to keep in mind is to lock it prior to reading or modifying it and unlock it afterwards.
             BitmapChest chest = new BitmapChest(orig);
             chest.LockBits();
 
@@ -174,7 +174,8 @@ namespace Pixelator_6000
             }
         }
 
-        public void Blur(Bitmap original, int intensity, BlurEffect method)
+        #region BlurEffects
+        public void BlurPicker(Bitmap original, int intensity, BlurEffect method)
         {
             switch (method)
             {
@@ -197,17 +198,20 @@ namespace Pixelator_6000
 
         }
 
-        public void BlurGauss(Bitmap original, int intensity)
+        private void BlurGauss(Bitmap original, int intensity)
         {
-            using (GaussianBlur blur = new GaussianBlur(original))
+            using (GaussianBlur gauss = new GaussianBlur(original))
             {
-                RedrawImageAfter(this, new RedrawEventArgs(blur.Process(intensity)));
+                RedrawImageAfter(this, new RedrawEventArgs(gauss.Process(intensity)));
             }
         }
 
-        public void BlurMedian(Bitmap original, int intensity)
+        private void BlurMedian(Bitmap original, int intensity)
         {
-
+            using (Bitmap result = MedianBlur.MedianFilter(original, intensity))
+            {
+                RedrawImageAfter(this, new RedrawEventArgs(result));
+            }
         }
 
         #endregion
