@@ -37,7 +37,6 @@ namespace Pixelator_6000
         private Logic _logic;
         private Bitmap _imageAfterAsBmp;
         private Bitmap _imageBeforeAsBmp;
-        private string _imageName;
         private bool _applyNewSettingsAutomatically = false;        //The overlord himself, look busy!                                                                    
         public enum KnownImageFormat { bmp, png, jpeg, gif };       //If you modify this enum, also modify every switch that uses it
 
@@ -53,6 +52,7 @@ namespace Pixelator_6000
         private float psLimit = 0.5f;
 
         //Prism settings
+        enum BaseColor { Red, Green, Blue }
         int rOffsetX = 0;
         int rOffsetY = 0;
         int gOffsetX = 0;
@@ -252,13 +252,10 @@ namespace Pixelator_6000
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Title = "Save image";
                 sfd.Filter = ".png|*.png|.bmp|*.bmp|.jpg|*.jpg|.gif(stationary)|*.gif";
-                
-                //find the best possible name for the new file, so that the user doesn't have to type anything or overwrite when lazy
+                //find the best possible name for the new file,
+                //so that the user doesn't have to type anything or overwrite when lazy
                 string initialDirectory =  sfd.InitialDirectory;
-
-                
-
-                sfd.FileName += _imageName + "Image_" + GetVacantSuffix();
+                sfd.FileName += "Image_" + GetVacantSuffix();
                 KnownImageFormat format;
                 if ((bool)sfd.ShowDialog())
                 {
@@ -489,66 +486,91 @@ namespace Pixelator_6000
         
 
         #region PrismControls
+               
 
-        private void prismSliderRX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void canvasRedOffsetSelector_MouseMove(object sender, MouseEventArgs e)
         {
-            //"Red offset X:0, Y:0"
-            rOffsetX = (int)e.NewValue;
-            lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
-            if (_applyNewSettingsAutomatically)
-            {
-                TryPrism();
-            }
+            UpdatePrismSelector(sender, e, BaseColor.Red);
         }
 
-        private void prismSliderRY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void canvasGreenOffsetSelector_MouseMove(object sender, MouseEventArgs e)
         {
-            //minus because the Y slider should be the other way around: +Y means down, -Y means up
-            rOffsetY = -(int)e.NewValue;
-            lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
-            if (_applyNewSettingsAutomatically)
-            {
-                TryPrism();
-            }
+            UpdatePrismSelector(sender, e, BaseColor.Green);
         }
 
-        private void prismSliderGX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void canvasBlueOffsetSelector_MouseMove(object sender, MouseEventArgs e)
         {
-            gOffsetX = (int)e.NewValue;
-            lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
-            if (_applyNewSettingsAutomatically)
-            {
-                TryPrism();
-            }
+            UpdatePrismSelector(sender, e, BaseColor.Blue);
+        }
+        private void canvasRedOffsetSelector_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            UpdatePrismSelector(sender, e, BaseColor.Red);
         }
 
-        private void prismSliderGY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void canvasGreenOffsetSelector_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            gOffsetY = -(int)e.NewValue;
-            lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
-            if (_applyNewSettingsAutomatically)
-            {
-                TryPrism();
-            }
+            UpdatePrismSelector(sender, e, BaseColor.Green);
         }
 
-        private void prismSliderBX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void canvasBlueOffsetSelector_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            bOffsetX = (int)e.NewValue;
-            lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
-            if (_applyNewSettingsAutomatically)
-            {
-                TryPrism();
-            }
+            UpdatePrismSelector(sender, e, BaseColor.Blue);
         }
 
-        private void prismSliderBY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void UpdatePrismSelector(object selectionCanvas, MouseEventArgs e, BaseColor baseColor)
         {
-            bOffsetY = -(int)e.NewValue;
-            lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
-            if(_applyNewSettingsAutomatically)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                TryPrism();
+                Canvas senderCanvas = selectionCanvas as Canvas;
+                System.Windows.Point clickPos = e.GetPosition(senderCanvas);
+
+                //Display ellipse centered at the clickPos
+                Ellipse elle = senderCanvas.Children[1] as Ellipse;
+                elle.Visibility = Visibility.Visible;
+                Canvas.SetLeft(elle, clickPos.X - elle.Width / 2);
+                Canvas.SetTop(elle, clickPos.Y - elle.Height / 2);
+
+                //Calculate the actual offset value that is being set, assuming range of values between -10 and 10 for both axes
+                var centerX = senderCanvas.Width / 2;
+                var centerY = senderCanvas.Height / 2;
+                System.Windows.Point clickPosRelativeToCenter = new System.Windows.Point(
+                    (int)clickPos.X - (int)centerX,
+                    (int)clickPos.Y - (int)centerY
+                    );
+                System.Windows.Point clickPosWeighedForMax10 = new System.Windows.Point(
+                    clickPosRelativeToCenter.X * 10 / (senderCanvas.Width / 2),
+                    clickPosRelativeToCenter.Y * 10 / (senderCanvas.Height / 2)
+                    );
+
+                //Set the global variables and label text
+                switch (baseColor)
+                {
+                    case BaseColor.Blue:
+                        {
+                            bOffsetX = (int)clickPosWeighedForMax10.X;
+                            bOffsetY = (int)clickPosWeighedForMax10.Y;
+                            lbPrismInfotextB.Content = "Blue offset X:" + bOffsetX + ", Y:" + bOffsetY;
+                            break;
+                        }
+                    case BaseColor.Green:
+                        {
+                            gOffsetX = (int)clickPosWeighedForMax10.X;
+                            gOffsetY = (int)clickPosWeighedForMax10.Y;
+                            lbPrismInfotextG.Content = "Green offset X:" + gOffsetX + ", Y:" + gOffsetY;
+                            break;
+                        }
+                    case BaseColor.Red:
+                        {
+                            rOffsetX = (int)clickPosWeighedForMax10.X;
+                            rOffsetY = (int)clickPosWeighedForMax10.Y;
+                            lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+                            break;
+                        }
+                }
+                if (_applyNewSettingsAutomatically)
+                {
+                    TryPrism();
+                }
             }
         }
 
@@ -557,11 +579,11 @@ namespace Pixelator_6000
             TryPrism();
         }
 
-        void TryPrism()
+        private void TryPrism()
         {
             if (_imageBeforeAsBmp != null)
             {
-                if(!_busy)
+                if (!_busy)
                 {
                     SetBusy(true);
                     Task t = Task.Run(delegate {
@@ -577,11 +599,10 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
-
         #endregion PrismControls
 
         #region Blur
-       
+
         private void cbBlurMethods_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(appFullyLoaded)
@@ -667,9 +688,57 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
-        #endregion
 
+
+
+
+
+
+
+
+
+
+
+        #endregion
 
         
     }
 }
+
+/*
+ * 
+ *          if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                Canvas senderCanvas = sender as Canvas;
+                System.Windows.Point clickPos = e.GetPosition(senderCanvas);
+
+                ellipseRedOffsetSelected.Visibility = Visibility.Visible;
+
+                Canvas.SetLeft(ellipseRedOffsetSelected, clickPos.X);
+                Canvas.SetTop(ellipseRedOffsetSelected, clickPos.Y);
+
+                var centerX = senderCanvas.Width / 2;
+                var centerY = senderCanvas.Height / 2;
+
+                System.Windows.Point clickPosRelativeToCenter = new System.Windows.Point(
+                    (int)clickPos.X - (int)centerX,
+                    (int)clickPos.Y - (int)centerY
+                    );
+
+                System.Windows.Point clickPosWeighedForMax10 = new System.Windows.Point(
+                    clickPosRelativeToCenter.X * 10 / (senderCanvas.Width / 2),
+                    clickPosRelativeToCenter.Y * 10 / (senderCanvas.Height / 2)
+                    );
+
+                rOffsetX = (int)clickPosWeighedForMax10.X;
+                rOffsetY = (int)clickPosWeighedForMax10.Y;
+
+                lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
+
+                if (_applyNewSettingsAutomatically)
+                {
+                    TryPrism();
+                }
+            }
+            
+     */
