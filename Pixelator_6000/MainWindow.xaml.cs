@@ -39,12 +39,14 @@ namespace Pixelator_6000
         private Bitmap _imageBeforeAsBmp;
         private bool _applyNewSettingsAutomatically = false;        //The overlord himself, look busy!                                                                    
         public enum KnownImageFormat { bmp, png, jpeg, gif };       //If you modify this enum, also modify every switch that uses it
+        
 
         /// <summary>
         /// Do not set this manually - use the SetBusy(true) method!
         /// </summary>
         private bool _busy = false;
         private bool appFullyLoaded = false;
+        private bool _autosave = false;
 
         //Pixelsort settings
         private bool psBright = true;
@@ -60,6 +62,12 @@ namespace Pixelator_6000
         int bOffsetX = 0;
         int bOffsetY = 0;
 
+        //Prism animation settings
+        enum SliderAnimationDirection { Left, Right }
+        private bool _animated = true;
+        private bool _loop = false;
+        private SliderAnimationDirection _animatedDirection = SliderAnimationDirection.Left;
+        
         //Blur settings        
         private BlurEffect blurMethod = BlurEffect.Gauss;
         private int blurMagnitude = 0;
@@ -68,7 +76,7 @@ namespace Pixelator_6000
         {
             _logic = new Logic();
             _logic.RedrawImageAfter += Logic_RedrawImageAfter;
-
+            
             appFullyLoaded = true;
         }
 
@@ -156,8 +164,7 @@ namespace Pixelator_6000
         and all will be well forever.
          */
         #endregion README
-
-
+        
         /// <summary>
         /// Use this event to return images from Logic to be rendered in the imageAfter control.
         /// </summary>
@@ -168,11 +175,71 @@ namespace Pixelator_6000
         {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 imageAfter.Source = BitmapConverter.Bitmap2BitmapSource(new Bitmap(e.image));
-
                 SetBusy(false);
             }));
-            _imageAfterAsBmp = e.image;            
+
+            if (_animated)
+            {
+                UpdateAnimationState();
+            }
+
+            if(_autosave)
+            {
+                Autosave(new Bitmap(e.image));
+            }
+           
+
+            _imageAfterAsBmp = new Bitmap(e.image);
+            
+
             return null;
+        }
+
+        void UpdateAnimationState()
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                //sketchy way to talk to the ui, doesn't let the user interact with it much while it's on
+
+                if (_animatedDirection == SliderAnimationDirection.Left)
+                {
+                    sliderPixelsortLimit.Value -= 1;
+                    if(sliderPixelsortLimit.Value == 0 && _loop)
+                    {
+                        _animatedDirection = SliderAnimationDirection.Right;
+                    }
+                }
+                else if (_animatedDirection == SliderAnimationDirection.Right)
+                {
+                    sliderPixelsortLimit.Value += 1;
+                    if (sliderPixelsortLimit.Value == 100 && _loop)
+                    {
+                        _animatedDirection = SliderAnimationDirection.Left;
+                    }
+                }
+
+            }));
+
+            if (_animated)
+            {
+                Task t = Task.Run(delegate {
+                    _logic.PixelsortByBrightness(psBright,
+                    psOrientation,
+                    psLimit,
+                    new Bitmap(_imageBeforeAsBmp));
+                });
+            }
+        }
+
+        int _autosavedAlready = 0;
+        public void Autosave(Bitmap image)
+        {
+            if (!Directory.Exists("c:\\Pixelator_autosaves"))
+            {
+                System.IO.Directory.CreateDirectory("c:\\Pixelator_autosaves");
+            }
+            
+            SaveImageToFile("c:\\Pixelator_autosaves\\" + ++_autosavedAlready + ".bmp", new Bitmap(image), KnownImageFormat.bmp);
+
         }
 
         /// <summary>
@@ -223,8 +290,7 @@ namespace Pixelator_6000
                 _imageName.Remove(_imageName.Length - 1, 1);*/
             }
         }
-
-                
+        
 
         private void btCommit_Click(object sender, RoutedEventArgs e)
         {
@@ -232,6 +298,8 @@ namespace Pixelator_6000
             {
                 imageBefore.Source = BitmapConverter.Bitmap2BitmapSource((Bitmap)_imageAfterAsBmp.Clone());
                 _imageBeforeAsBmp = _imageAfterAsBmp;
+                
+
             }
         }
                 
@@ -335,6 +403,7 @@ namespace Pixelator_6000
         /// <param name="format"></param>
         public void SaveImageToFile(string filePath, Bitmap image, KnownImageFormat format)
         {
+            
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 ImageFormat finalFormat = ImageFormat.Png;
@@ -517,6 +586,44 @@ namespace Pixelator_6000
             UpdatePrismSelector(sender, e, BaseColor.Blue);
         }
 
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem itemSelected = e.AddedItems[0] as ComboBoxItem;
+            switch (itemSelected.Content as string)
+            {
+                case "No animation":
+                    {
+                        _animated = false;
+                        break;
+                    }
+                case ">>>>":
+                    {
+                        _animated = true;
+                        _animatedDirection = SliderAnimationDirection.Right;
+                        TryPixelsort();
+                        break;
+                    }
+                case "<<<<":
+                    {
+                        _animated = true;
+                        _animatedDirection = SliderAnimationDirection.Left;
+                        TryPixelsort();
+                        break;
+                    }
+                case "Loop":
+                    {
+                        _animated = true;
+                        _loop = true;
+                        break;
+                    }
+                default:
+                    {
+                        _animated = false;
+                        break;
+                    }
+            }
+        }
+
         private void UpdatePrismSelector(object selectionCanvas, MouseEventArgs e, BaseColor baseColor)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -599,6 +706,9 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
+
+
+
         #endregion PrismControls
 
         #region Blur
@@ -688,6 +798,8 @@ namespace Pixelator_6000
                 MessageBox.Show("Load an image first.");
             }
         }
+
+
 
 
 
