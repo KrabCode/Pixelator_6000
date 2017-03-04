@@ -503,7 +503,50 @@ namespace Pixelator_6000
                         break;
                     }
             }
-            
+        }
+
+        /// <summary>
+        /// Animation combo box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem itemSelected = e.AddedItems[0] as ComboBoxItem;
+            switch (itemSelected.Content as string)
+            {
+                case "None":
+                    {
+                        _animated = false;
+                        break;
+                    }
+                case ">>>>":
+                    {
+                        _animated = true;
+                        _animatedDirection = SliderAnimationDirection.Right;
+                        TryPixelsort();
+                        break;
+                    }
+                case "<<<<":
+                    {
+                        _animated = true;
+                        _animatedDirection = SliderAnimationDirection.Left;
+                        TryPixelsort();
+                        break;
+                    }
+                case "Loop":
+                    {
+                        _animated = true;
+                        _loop = true;
+                        TryPixelsort();
+                        break;
+                    }
+                default:
+                    {
+                        _animated = false;
+                        break;
+                    }
+            }
         }
 
         private void sliderPixelsortLimit_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -586,43 +629,7 @@ namespace Pixelator_6000
             UpdatePrismSelector(sender, e, BaseColor.Blue);
         }
 
-        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBoxItem itemSelected = e.AddedItems[0] as ComboBoxItem;
-            switch (itemSelected.Content as string)
-            {
-                case "No animation":
-                    {
-                        _animated = false;
-                        break;
-                    }
-                case ">>>>":
-                    {
-                        _animated = true;
-                        _animatedDirection = SliderAnimationDirection.Right;
-                        TryPixelsort();
-                        break;
-                    }
-                case "<<<<":
-                    {
-                        _animated = true;
-                        _animatedDirection = SliderAnimationDirection.Left;
-                        TryPixelsort();
-                        break;
-                    }
-                case "Loop":
-                    {
-                        _animated = true;
-                        _loop = true;
-                        break;
-                    }
-                default:
-                    {
-                        _animated = false;
-                        break;
-                    }
-            }
-        }
+        
 
         private void UpdatePrismSelector(object selectionCanvas, MouseEventArgs e, BaseColor baseColor)
         {
