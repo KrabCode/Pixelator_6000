@@ -515,14 +515,16 @@ namespace Pixelator_6000
             ComboBoxItem itemSelected = e.AddedItems[0] as ComboBoxItem;
             switch (itemSelected.Content as string)
             {
-                case "None":
+                case "No animation":
                     {
                         _animated = false;
+                        _loop = false;
                         break;
                     }
                 case ">>>>":
                     {
                         _animated = true;
+                        _loop = false;
                         _animatedDirection = SliderAnimationDirection.Right;
                         TryPixelsort();
                         break;
@@ -530,6 +532,7 @@ namespace Pixelator_6000
                 case "<<<<":
                     {
                         _animated = true;
+                        _loop = false;
                         _animatedDirection = SliderAnimationDirection.Left;
                         TryPixelsort();
                         break;

@@ -96,7 +96,7 @@
                         <TextBlock x:Name="lbPixelsortLimit" Grid.Column="1" Margin="10,0,0,0" TextWrapping="Wrap" Text="Limit: 0,5" HorizontalAlignment="Left" Width="97" Height="14" VerticalAlignment="Top"/>
                         <Button x:Name="btPixelsortApply" Content="Apply" Grid.Column="1" Grid.Row="1" Click="btPixelsortApply_Click" Width="75" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
                         <ComboBox x:Name="comboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="120" SelectedIndex="0" SelectionChanged="comboBox_SelectionChanged">
-                            <ComboBoxItem Content="None"/>
+                            <ComboBoxItem Content="No animation"/>
                             <ComboBoxItem Content=">>>>"/>
                             <ComboBoxItem Content="&lt;&lt;&lt;&lt;" />
                             <ComboBoxItem Content="Loop" />
