@@ -46,7 +46,10 @@ namespace Pixelator_6000
         /// </summary>
         private bool _busy = false;
         private bool appFullyLoaded = false;
+
+
         private bool _autosave = false;
+        int _autosavedAlready = 0;
 
         //Pixelsort settings
         private bool psBright = true;
@@ -195,42 +198,8 @@ namespace Pixelator_6000
             return null;
         }
 
-        void UpdateAnimationState()
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() => {
-                //sketchy way to talk to the ui, doesn't let the user interact with it much while it's on
+        
 
-                if (_animatedDirection == SliderAnimationDirection.Left)
-                {
-                    sliderPixelsortLimit.Value -= 1;
-                    if(sliderPixelsortLimit.Value == 0 && _loop)
-                    {
-                        _animatedDirection = SliderAnimationDirection.Right;
-                    }
-                }
-                else if (_animatedDirection == SliderAnimationDirection.Right)
-                {
-                    sliderPixelsortLimit.Value += 1;
-                    if (sliderPixelsortLimit.Value == 100 && _loop)
-                    {
-                        _animatedDirection = SliderAnimationDirection.Left;
-                    }
-                }
-
-            }));
-
-            if (_animated)
-            {
-                Task t = Task.Run(delegate {
-                    _logic.PixelsortByBrightness(psBright,
-                    psOrientation,
-                    psLimit,
-                    new Bitmap(_imageBeforeAsBmp));
-                });
-            }
-        }
-
-        int _autosavedAlready = 0;
         public void Autosave(Bitmap image)
         {
             if (!Directory.Exists("c:\\Pixelator_autosaves"))
@@ -547,11 +516,48 @@ namespace Pixelator_6000
                 default:
                     {
                         _animated = false;
+                        _loop = false;
                         break;
                     }
             }
         }
+        /// <summary>
+        /// Called when (_animated == true) by the Logic_RedrawImageAfter event handler
+        /// </summary>
+        void UpdateAnimationState()
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                //sketchy way to talk to the ui, doesn't let the user interact with it much while it's on
 
+                if (_animatedDirection == SliderAnimationDirection.Left)
+                {
+                    sliderPixelsortLimit.Value -= 1;
+                    if (sliderPixelsortLimit.Value == 0 && _loop)
+                    {
+                        _animatedDirection = SliderAnimationDirection.Right;
+                    }
+                }
+                else if (_animatedDirection == SliderAnimationDirection.Right)
+                {
+                    sliderPixelsortLimit.Value += 1;
+                    if (sliderPixelsortLimit.Value == 100 && _loop)
+                    {
+                        _animatedDirection = SliderAnimationDirection.Left;
+                    }
+                }
+
+            }));
+
+            if (_animated)
+            {
+                Task t = Task.Run(delegate {
+                    _logic.PixelsortByBrightness(psBright,
+                    psOrientation,
+                    psLimit,
+                    new Bitmap(_imageBeforeAsBmp));
+                });
+            }
+        }
         private void sliderPixelsortLimit_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             float newValue = (float)e.NewValue / 100;
@@ -827,40 +833,3 @@ namespace Pixelator_6000
     }
 }
 
-/*
- * 
- *          if(e.LeftButton == MouseButtonState.Pressed)
-            {
-                Canvas senderCanvas = sender as Canvas;
-                System.Windows.Point clickPos = e.GetPosition(senderCanvas);
-
-                ellipseRedOffsetSelected.Visibility = Visibility.Visible;
-
-                Canvas.SetLeft(ellipseRedOffsetSelected, clickPos.X);
-                Canvas.SetTop(ellipseRedOffsetSelected, clickPos.Y);
-
-                var centerX = senderCanvas.Width / 2;
-                var centerY = senderCanvas.Height / 2;
-
-                System.Windows.Point clickPosRelativeToCenter = new System.Windows.Point(
-                    (int)clickPos.X - (int)centerX,
-                    (int)clickPos.Y - (int)centerY
-                    );
-
-                System.Windows.Point clickPosWeighedForMax10 = new System.Windows.Point(
-                    clickPosRelativeToCenter.X * 10 / (senderCanvas.Width / 2),
-                    clickPosRelativeToCenter.Y * 10 / (senderCanvas.Height / 2)
-                    );
-
-                rOffsetX = (int)clickPosWeighedForMax10.X;
-                rOffsetY = (int)clickPosWeighedForMax10.Y;
-
-                lbPrismInfotextR.Content = "Red offset X:" + rOffsetX + ", Y:" + rOffsetY;
-
-                if (_applyNewSettingsAutomatically)
-                {
-                    TryPrism();
-                }
-            }
-            
-     */
