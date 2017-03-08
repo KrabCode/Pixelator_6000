@@ -15,3 +15,4 @@ With thanks to these programmers:
 
 - Michal Dymel: https://github.com/mdymel/superfastblur  
 - Dewald Esterhuizen: https://softwarebydefault.com/2013/06/09/image-blur-filters/  
+- Vano Maisuradze: https://www.codeproject.com/tips/240428/work-with-bitmap-faster-with-csharp
