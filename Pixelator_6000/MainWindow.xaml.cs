@@ -70,7 +70,8 @@ namespace Pixelator_6000
         private bool _animated = true;
         private bool _loop = false;
         private SliderAnimationDirection _animatedDirection = SliderAnimationDirection.Left;
-        
+        int _animationFramesCounter = 0;
+
         //Blur settings        
         private BlurEffect blurMethod = BlurEffect.Gauss;
         private int blurMagnitude = 0;
@@ -184,20 +185,30 @@ namespace Pixelator_6000
             if (_animated)
             {
                 UpdateAnimationState();
+
+                if (_animationFramesCounter++ == 100)
+                {
+                    _animationEveryFrameCalculated = true;
+                }
             }
 
-            if(_autosave)
+            
+
+           
+
+            if (_autosave)
             {
                 Autosave(new Bitmap(e.image));
             }
            
 
             _imageAfterAsBmp = new Bitmap(e.image);
+
             
+
 
             return null;
         }
-
         
 
         public void Autosave(Bitmap image)
@@ -474,6 +485,8 @@ namespace Pixelator_6000
             }
         }
 
+        bool _animationEveryFrameCalculated = false;
+        List<Bitmap> _animationFramesSoFar = new List<Bitmap>();
         /// <summary>
         /// Animation combo box
         /// </summary>
@@ -489,27 +502,11 @@ namespace Pixelator_6000
                         _animated = false;
                         _loop = false;
                         break;
-                    }
-                case ">>>>":
-                    {
-                        _animated = true;
-                        _loop = false;
-                        _animatedDirection = SliderAnimationDirection.Right;
-                        TryPixelsort();
-                        break;
-                    }
-                case "<<<<":
-                    {
-                        _animated = true;
-                        _loop = false;
-                        _animatedDirection = SliderAnimationDirection.Left;
-                        TryPixelsort();
-                        break;
-                    }
+                    }                
                 case "Loop":
                     {
                         _animated = true;
-                        _loop = true;
+                        _loop = true;                        
                         TryPixelsort();
                         break;
                     }
@@ -528,6 +525,9 @@ namespace Pixelator_6000
         {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 //sketchy way to talk to the ui, doesn't let the user interact with it much while it's on
+
+                
+
 
                 if (_animatedDirection == SliderAnimationDirection.Left)
                 {
